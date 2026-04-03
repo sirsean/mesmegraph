@@ -8,7 +8,7 @@ export type SpecDefinition = {
 
 export const DEFAULT_SPEC_ID = "hyp";
 
-/** Four signature specs — deck order is display order. */
+/** Five signature specs — deck order is display order. */
 export const SPEC_LIST: readonly SpecDefinition[] = [
   {
     id: "hyp",
@@ -41,6 +41,14 @@ export const SPEC_LIST: readonly SpecDefinition[] = [
     subtitle: "Planar temperature map",
     preview:
       "linear-gradient(135deg, #0a2820 0%, #2d6b5a 38%, #e8c547 72%, #e85a8c 100%)",
+  },
+  {
+    id: "lut",
+    code: "05",
+    title: "LUT grade",
+    subtitle: "3D cube · trilinear remap",
+    preview:
+      "linear-gradient(118deg, #2a1810 0%, #6b3a22 32%, #b87333 58%, #d4a574 100%)",
   },
 ] as const;
 

@@ -16,6 +16,7 @@ const effectLoaders: ReadonlyMap<string, EffectLoader> = new Map([
   ["hyp", () => import("./implementations/hyperspec").then((m) => m.hyperspecEffect)],
   ["heat", () => import("./implementations/pixelHeatmap").then((m) => m.heatmapEffect)],
   ["gl", () => import("./webgl/rgbSplitPass").then((m) => m.rgbSplitEffect)],
+  ["lut", () => import("./webgl/lut3dPass").then((m) => m.lutGradeEffect)],
 ]);
 
 /**
