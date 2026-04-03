@@ -62,3 +62,5 @@ Scaffold complete (React + Vite + Workers). Deck, live camera preview, lazy-load
 ## Attribution (reference materials)
 
 Hyperspec badge source image used for brand exploration: [compendium.fringedrifters.com — Hyperspec](https://compendium.fringedrifters.com/iconography/05). Respect third-party terms when deriving logos or imagery.
+
+<!-- deploy: verify Workers Builds hook -->
