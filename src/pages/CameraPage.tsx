@@ -7,6 +7,7 @@ import { getSpecById } from "../data/specs";
 import { loadEffect } from "../effects/registry";
 import type { Effect } from "../effects/types";
 import { useCameraStream } from "../hooks/useCameraStream";
+import { readEdgeTraceStrength, writeEdgeTraceStrength } from "../storage/edgeTraceStrength";
 import { writeSelectedSpecId } from "../storage/selectedSpec";
 
 export function CameraPage() {
@@ -38,6 +39,7 @@ function CameraPageLive({ spec }: { spec: SpecDefinition }) {
   const [captureBusy, setCaptureBusy] = useState(false);
   const [captureNotice, setCaptureNotice] = useState<string | null>(null);
   const [hasLastCapture, setHasLastCapture] = useState(false);
+  const [wireframeStrength, setWireframeStrength] = useState(() => readEdgeTraceStrength());
   const lastCaptureRef = useRef<{ blob: Blob; filename: string } | null>(null);
 
   const showOsShare =
@@ -133,7 +135,12 @@ function CameraPageLive({ spec }: { spec: SpecDefinition }) {
           autoPlay
         />
         {status === "live" && effect && !lensError ? (
-          <CameraPreview ref={previewRef} videoRef={videoRef} effect={effect} />
+          <CameraPreview
+            ref={previewRef}
+            videoRef={videoRef}
+            effect={effect}
+            wireframeStrength={wireframeStrength}
+          />
         ) : null}
 
         {lensLoading ? (
@@ -170,6 +177,46 @@ function CameraPageLive({ spec }: { spec: SpecDefinition }) {
           </div>
         ) : null}
       </div>
+
+      {status === "live" && effect && !lensError ? (
+        <div className="camera__wireframe">
+          <div className="camera__wireframe-panel">
+            <div className="camera__wireframe-panel-head">
+              <label className="camera__wireframe-label" htmlFor="camera-wireframe-strength">
+                Edge trace
+              </label>
+              <span className="camera__wireframe-readout" aria-hidden="true">
+                {String(Math.round(wireframeStrength * 100)).padStart(3, "0")}
+              </span>
+            </div>
+            <div className="camera__wireframe-slot" aria-hidden="true">
+              <span className="camera__wireframe-tick-label">0</span>
+              <div className="camera__wireframe-rail">
+                <div className="camera__wireframe-ticks" />
+                <input
+                  id="camera-wireframe-strength"
+                  className="camera__wireframe-slider"
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={Math.round(wireframeStrength * 100)}
+                  onChange={(e) => {
+                    const v = Number(e.target.value) / 100;
+                    setWireframeStrength(v);
+                    writeEdgeTraceStrength(v);
+                  }}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={Math.round(wireframeStrength * 100)}
+                  aria-valuetext={`${Math.round(wireframeStrength * 100)} percent`}
+                />
+              </div>
+              <span className="camera__wireframe-tick-label">100</span>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <div className="camera__capture" aria-label="Still capture">
         <button

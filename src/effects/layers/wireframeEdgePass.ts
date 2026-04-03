@@ -153,6 +153,8 @@ class WireframeEdgeRenderer {
     height: number,
     context: PostLayerContext,
   ): void {
+    const strength = Math.min(1, Math.max(0, context.wireframeStrength ?? 1));
+    if (strength <= 0) return;
     if (!this.init()) return;
     const gl = this.gl!;
     const program = this.program!;
@@ -212,7 +214,7 @@ class WireframeEdgeRenderer {
 
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha = strength;
     ctx.drawImage(canvas, 0, 0, width, height);
     ctx.restore();
   }

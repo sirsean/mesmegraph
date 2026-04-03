@@ -1,1 +1,5 @@
-export { runPreviewPass, runCapturePass } from "../effects/renderPreview";
+export {
+  runCapturePass,
+  runPreviewPass,
+  type PreviewPostOptions,
+} from "../effects/renderPreview";

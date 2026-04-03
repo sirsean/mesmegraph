@@ -1,6 +1,11 @@
 import { applyPostLayers } from "./layers/postPipeline";
 import type { CaptureContext, Effect } from "./types";
 
+export type PreviewPostOptions = {
+  /** 0 = hide wireframe overlay; 1 = full strength. Default 1 when omitted. */
+  wireframeStrength?: number;
+};
+
 /**
  * Live preview: applies the loaded effect with a clean 2D state, then shared post layers.
  */
@@ -10,13 +15,20 @@ export function runPreviewPass(
   video: HTMLVideoElement,
   width: number,
   height: number,
+  options?: PreviewPostOptions,
 ): void {
   ctx.save();
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = "source-over";
   ctx.filter = "none";
   effect.applyPreview({ ctx, video, width, height });
-  applyPostLayers(ctx, width, height, { video, effectId: effect.id });
+  applyPostLayers(ctx, width, height, {
+    video,
+    effectId: effect.id,
+    ...(options?.wireframeStrength !== undefined
+      ? { wireframeStrength: options.wireframeStrength }
+      : {}),
+  });
   ctx.restore();
 }
 
@@ -30,6 +42,7 @@ export function runCapturePass(
   video: HTMLVideoElement,
   width: number,
   height: number,
+  options?: PreviewPostOptions,
 ): void {
   const c: CaptureContext = { canvas, ctx, video, width, height };
   ctx.save();
@@ -37,6 +50,12 @@ export function runCapturePass(
   ctx.globalCompositeOperation = "source-over";
   ctx.filter = "none";
   effect.applyCapture(c);
-  applyPostLayers(ctx, width, height, { video, effectId: effect.id });
+  applyPostLayers(ctx, width, height, {
+    video,
+    effectId: effect.id,
+    ...(options?.wireframeStrength !== undefined
+      ? { wireframeStrength: options.wireframeStrength }
+      : {}),
+  });
   ctx.restore();
 }
