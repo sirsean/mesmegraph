@@ -1,11 +1,8 @@
-import { useState } from "react";
 import { SpecCard } from "../components/SpecCard";
 import { SPEC_LIST } from "../data/specs";
 import { writeSelectedSpecId } from "../storage/selectedSpec";
 
 export function DeckPage() {
-  const [apiLabel, setApiLabel] = useState<string | null>(null);
-
   return (
     <>
       <header className="hero">
@@ -28,26 +25,6 @@ export function DeckPage() {
             </li>
           ))}
         </ul>
-      </section>
-
-      <section className="panel" aria-label="Development checks">
-        <button
-          type="button"
-          className="ghost-btn"
-          onClick={() => {
-            fetch("/api/")
-              .then((res) => res.json() as Promise<{ app: string }>)
-              .then((data) => setApiLabel(data.app))
-              .catch(() => setApiLabel("unavailable"));
-          }}
-        >
-          Ping Worker API
-        </button>
-        {apiLabel !== null && (
-          <p className="api-hint" role="status">
-            Response: {apiLabel}
-          </p>
-        )}
       </section>
     </>
   );

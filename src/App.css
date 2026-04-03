@@ -171,12 +171,6 @@
   min-width: 0;
 }
 
-.panel {
-  padding: 1rem 0;
-  border-top: 1px solid var(--color-border);
-  max-width: 38rem;
-}
-
 .ghost-btn {
   border: 1px solid var(--color-border-strong);
   background: var(--color-void-elevated);
@@ -385,11 +379,4 @@ a.ghost-btn {
 
 .camera__footer {
   padding-top: 0.5rem;
-}
-
-.api-hint {
-  margin: 0.75rem 0 0;
-  font-size: var(--text-small);
-  font-family: var(--font-mono);
-  color: var(--color-dim);
 }
