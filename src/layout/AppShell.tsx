@@ -5,22 +5,25 @@ import "../App.css";
 function routeReadout(pathname: string): string {
   if (pathname === "/") return "MESMEGRAPH · OPTICAL DECK · v0";
   if (pathname.startsWith("/camera")) return "MESMEGRAPH · LENS STACK · v0";
+  if (pathname === "/gallery") return "MESMEGRAPH · FIELD LOG · v0";
   return "MESMEGRAPH";
 }
 
 export function AppShell() {
   const { pathname } = useLocation();
-  const onCamera = pathname.startsWith("/camera");
 
   return (
     <div className="shell">
       <div className="top-bar">
         <div className="top-bar__left">
-          {onCamera && (
+          {pathname !== "/" && (
             <Link to="/" className="nav-pill">
               ← Deck
             </Link>
           )}
+          <Link to="/gallery" className="nav-pill">
+            Gallery
+          </Link>
           <p className="machine-readout" aria-hidden>
             {routeReadout(pathname)}
           </p>

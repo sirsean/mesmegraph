@@ -7,10 +7,11 @@ import { getSpecById } from "../data/specs";
 import { loadEffect } from "../effects/registry";
 import type { Effect } from "../effects/types";
 import { useCameraStream } from "../hooks/useCameraStream";
+import { addCaptureToGallery } from "../storage/captureGallery";
 import { readEdgeTraceStrength, writeEdgeTraceStrength } from "../storage/edgeTraceStrength";
 import { writeSelectedSpecId } from "../storage/selectedSpec";
 
-export function CameraPage() {
+function CameraPage() {
   const { specId } = useParams<{ specId: string }>();
   const spec = getSpecById(specId);
 
@@ -25,6 +26,8 @@ export function CameraPage() {
 
   return <CameraPageLive spec={spec} />;
 }
+
+export default CameraPage;
 
 type LensResult =
   | { scopeId: string; retry: number; kind: "ok"; effect: Effect }
@@ -92,12 +95,14 @@ function CameraPageLive({ spec }: { spec: SpecDefinition }) {
       if (!blob) return;
       const filename = `mesmegraph-${id}-${Date.now()}.png`;
       const { copiedClipboard } = await saveCaptureToDiskAndClipboard(blob, filename);
+      const galleryOk = (await addCaptureToGallery(blob, { specId: id, filename })) !== null;
       lastCaptureRef.current = { blob, filename };
       setHasLastCapture(true);
+      const g = galleryOk ? " Stored in Gallery." : "";
       if (copiedClipboard) {
-        setCaptureNotice("Saved. Copied to clipboard.");
+        setCaptureNotice(`Saved. Copied to clipboard.${g}`);
       } else {
-        setCaptureNotice("Saved. Use the downloaded file.");
+        setCaptureNotice(`Saved. Use the downloaded file.${g}`);
       }
     } finally {
       setCaptureBusy(false);
@@ -247,6 +252,9 @@ function CameraPageLive({ spec }: { spec: SpecDefinition }) {
       ) : null}
 
       <div className="camera__footer">
+        <Link to="/gallery" className="ghost-btn">
+          Gallery
+        </Link>
         <Link to="/" className="ghost-btn">
           Return to deck
         </Link>
