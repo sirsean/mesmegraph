@@ -23,7 +23,7 @@ This file guides automated and human contributors so changes stay aligned with `
 - `src/hooks/useCameraStream.ts` — `getUserMedia` lifecycle.
 - `src/camera/saveCapture.ts` — **PNG** stills: **download** + **clipboard** (`ClipboardItem`); optional OS **Share…** on non-Windows when `navigator.share` exists; do not rely on desktop OS share for clipboard (`M6`).
 - `src/effects/` — **`Effect`** registry: **`loadEffect(specId)`** lazy-loads heavy modules (`hyp`, `heat`, `gl`); **`getEffect`** reads the cache after load; **`runPreviewPass(effect, …)` / `runCapturePass(effect, …)`** in `renderPreview.ts` (re-exported from `camera/previewPipeline.ts`). **Hyperspec** (`hyperspec.ts`) is the signature spectral + ghosting stack. Register loaders in `registry.ts`.
-- `worker/` — Cloudflare Worker (`main` in `wrangler.jsonc`).
+- `worker/` — Cloudflare Worker (`main` in `wrangler.jsonc`). Production route: **Custom Domain** `mesmegraph.sirsean.me` (zone `sirsean.me`), `workers_dev: false`.
 
 ## Non-negotiables
 

@@ -40,7 +40,7 @@ npm run brand-assets   # Regenerate favicon / touch icons + og-social-card from 
 |------|------|
 | `src/` | React app |
 | `worker/` | Worker entry (`/api/*` and future server logic) |
-| `wrangler.jsonc` | Worker name, `main`, SPA `not_found_handling` |
+| `wrangler.jsonc` | Worker name, `main`, SPA `not_found_handling`, production **Custom Domain** (`mesmegraph.sirsean.me`) |
 | `public/` | Favicon, Apple touch icon, Open Graph image (`og-social-card.png` — three cards) for link previews |
 | `art/` | Concept art; `hyperspec-badge-source.png` (icon source); `4994fb85-…png` (social preview source) |
 | `PLAN.md` | Milestones |
@@ -48,7 +48,9 @@ npm run brand-assets   # Regenerate favicon / touch icons + og-social-card from 
 
 ## Deploy
 
-1. Log in: `npx wrangler login`
+Production hostname is **`mesmegraph.sirsean.me`**, configured in `wrangler.jsonc` as a [Workers Custom Domain](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/) on zone **`sirsean.me`**. Wrangler can create the DNS record and certificate on deploy when that zone is on the same Cloudflare account. `workers_dev` is set to `false` so only this hostname is used (no `*.workers.dev` URL).
+
+1. Log in: `npx wrangler login` (account with access to `sirsean.me`).
 2. `npm run deploy`
 
 For CI, use [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/) with deploy command `npm run deploy` (or `npx wrangler deploy` after a cached build).
