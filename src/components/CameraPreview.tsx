@@ -6,6 +6,7 @@ import {
   useRef,
 } from "react";
 import { runPreviewPass } from "../camera/previewPipeline";
+import { disposePostLayers } from "../effects/layers/postPipeline";
 import type { Effect } from "../effects/types";
 import "./CameraPreview.css";
 
@@ -156,6 +157,12 @@ export const CameraPreview = forwardRef<CameraPreviewHandle, CameraPreviewProps>
         effect.dispose();
       };
     }, [videoRef, effect]);
+
+    useEffect(() => {
+      return () => {
+        disposePostLayers();
+      };
+    }, []);
 
     return (
       <div ref={stageRef} className="camera-preview">

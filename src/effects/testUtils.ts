@@ -1,3 +1,4 @@
+import { applyPostLayers } from "./layers/postPipeline";
 import { loadEffect } from "./registry";
 import type { PreviewContext } from "./types";
 
@@ -19,5 +20,6 @@ export async function renderEffectFrameForTest(
   ctx.globalCompositeOperation = "source-over";
   ctx.filter = "none";
   effect.applyPreview(c);
+  applyPostLayers(ctx, width, height, { video, effectId });
   ctx.restore();
 }

@@ -1,7 +1,8 @@
+import { applyPostLayers } from "./layers/postPipeline";
 import type { CaptureContext, Effect } from "./types";
 
 /**
- * Live preview: applies the loaded effect with a clean 2D state.
+ * Live preview: applies the loaded effect with a clean 2D state, then shared post layers.
  */
 export function runPreviewPass(
   effect: Effect,
@@ -15,6 +16,7 @@ export function runPreviewPass(
   ctx.globalCompositeOperation = "source-over";
   ctx.filter = "none";
   effect.applyPreview({ ctx, video, width, height });
+  applyPostLayers(ctx, width, height, { video, effectId: effect.id });
   ctx.restore();
 }
 
@@ -35,5 +37,6 @@ export function runCapturePass(
   ctx.globalCompositeOperation = "source-over";
   ctx.filter = "none";
   effect.applyCapture(c);
+  applyPostLayers(ctx, width, height, { video, effectId: effect.id });
   ctx.restore();
 }

@@ -2,14 +2,6 @@ import { drawVideoCover } from "../../camera/drawVideoCover";
 import type { Effect, PreviewContext } from "../types";
 import { captureMirrorsPreview } from "../types";
 
-/**
- * Wireframe / edge detection (future work): run a Sobel or Scharr pass on video luma
- * (WebGL fragment shader or small getImageData kernel), threshold magnitude, and draw
- * edges in a neon color (e.g. mineral teal / signal pink) with additive or screen blend
- * over the spectral frame — or ship as a separate spec / `hyp` variant. Canvas 2D has no
- * built-in edge filter; WebGL one full-screen pass is the practical path.
- */
-
 /** Primary ghost layer drawn under the current spectral (offset stack). */
 const GHOST_MAIN = 0.88;
 /** Side echoes (horizontal); strong so motion reads at the fringes. */
