@@ -1,0 +1,8 @@
+/* Bundled via Vite from repo art/ — keep OTF at art/TheFringe-Giger.otf */
+@font-face {
+  font-family: "Fringe Giger";
+  src: url("../../../art/TheFringe-Giger.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}

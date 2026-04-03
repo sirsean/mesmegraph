@@ -101,7 +101,10 @@ export const CameraPreview = forwardRef<CameraPreviewHandle, CameraPreviewProps>
         const w = stage.clientWidth;
         const h = stage.clientHeight;
         if (w <= 0 || h <= 0) return;
-        runPreviewPass(effect, ctx, v, w, h, { wireframeStrength: wireRef.current });
+        runPreviewPass(effect, ctx, v, w, h, {
+          wireframeStrength: wireRef.current,
+          nowMs: performance.now(),
+        });
       };
 
       const kick = () => {

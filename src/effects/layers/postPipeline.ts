@@ -1,3 +1,4 @@
+import { alienWhisperLayer } from "./alienWhisperLayer";
 import type { PostLayer, PostLayerContext } from "./types";
 import { wireframeEdgeLayer } from "./wireframeEdgePass";
 
@@ -5,7 +6,7 @@ import { wireframeEdgeLayer } from "./wireframeEdgePass";
  * Ordered post-processing stack (runs after every base {@link Effect} in preview/capture).
  * Add layers here to reuse across filters (e.g. wireframe edges on hyp, heat, gl, …).
  */
-export const postLayers: readonly PostLayer[] = [wireframeEdgeLayer];
+export const postLayers: readonly PostLayer[] = [wireframeEdgeLayer, alienWhisperLayer];
 
 export function applyPostLayers(
   ctx: CanvasRenderingContext2D,

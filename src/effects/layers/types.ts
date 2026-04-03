@@ -8,6 +8,8 @@ export type PostLayerContext = {
   effectId: string;
   /** 0 = no wireframe overlay; 1 = full strength. Omitted defaults to 1. */
   wireframeStrength?: number;
+  /** Monotonic clock for post layers (e.g. alien whispers). Prefer `performance.now()` from the preview loop. */
+  nowMs?: number;
 };
 
 export type PostLayer = {

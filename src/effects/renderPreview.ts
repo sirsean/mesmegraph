@@ -4,6 +4,8 @@ import type { CaptureContext, Effect } from "./types";
 export type PreviewPostOptions = {
   /** 0 = hide wireframe overlay; 1 = full strength. Default 1 when omitted. */
   wireframeStrength?: number;
+  /** Passed to post layers for time-based overlays (alien whispers). */
+  nowMs?: number;
 };
 
 /**
@@ -28,6 +30,7 @@ export function runPreviewPass(
     ...(options?.wireframeStrength !== undefined
       ? { wireframeStrength: options.wireframeStrength }
       : {}),
+    ...(options?.nowMs !== undefined ? { nowMs: options.nowMs } : {}),
   });
   ctx.restore();
 }
@@ -56,6 +59,7 @@ export function runCapturePass(
     ...(options?.wireframeStrength !== undefined
       ? { wireframeStrength: options.wireframeStrength }
       : {}),
+    ...(options?.nowMs !== undefined ? { nowMs: options.nowMs } : {}),
   });
   ctx.restore();
 }
