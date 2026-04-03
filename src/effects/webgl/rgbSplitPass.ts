@@ -14,6 +14,7 @@ void main() {
 const FRAG = `
 precision mediump float;
 uniform sampler2D u_tex;
+uniform float u_time;
 varying vec2 v_uv;
 
 void main() {
@@ -21,21 +22,26 @@ void main() {
      so the output matches the 2D canvas / camera (was appearing upside down). */
   vec2 t = vec2(v_uv.x, 1.0 - v_uv.y);
 
-  /* Horizontal “slit” tear per band (deterministic from row index). */
+  /* Horizontal “slit” bands — time scale keeps drift visible but unhurried. */
+  float th = u_time * 0.055;
   float rows = 80.0;
   float row = floor(t.y * rows);
-  float rng = fract(sin(row * 127.089) * 43758.5453);
-  float tear = (rng - 0.5) * 0.055;
+  float rng = fract(sin(row * 127.089 + th * 6.7) * 43758.5453);
+  float tear = (rng - 0.5) * 0.052;
+  tear += sin(th * 11.0 + row * 1.15) * 0.02;
+  tear += sin(th * 19.0 + t.y * 120.0) * 0.011;
+  tear += sin(th * 3.4 + row * 0.08) * 0.014;
 
-  /* Stronger RGB split than before (was ~0.008 + LINEAR blur). */
-  vec2 chroma = vec2(0.038, 0.0);
+  /* RGB split strength breathes with time (still horizontal). */
+  float chromaR = 0.034 + sin(th * 5.5 + row * 0.35) * 0.014;
+  vec2 chroma = vec2(chromaR, 0.0);
 
   float r = texture2D(u_tex, t + chroma + vec2(tear, 0.0)).r;
   float g = texture2D(u_tex, t).g;
   float b = texture2D(u_tex, t - chroma * 0.9 + vec2(-tear * 0.65, 0.0)).b;
 
-  /* Subtle scanlines — reinforces “broken signal” without heavy blur. */
-  float scan = mod(floor(gl_FragCoord.y), 2.0) < 0.5 ? 0.9 : 1.0;
+  /* Scanlines crawl slowly (decoupled from th). */
+  float scan = mod(floor(gl_FragCoord.y + floor(u_time * 6.0)), 2.0) < 0.5 ? 0.9 : 1.0;
   gl_FragColor = vec4(r * scan, g * scan, b * scan, 1.0);
 }
 `;
@@ -76,6 +82,7 @@ class RgbSplitRenderer {
   private program: WebGLProgram | null = null;
   private tex: WebGLTexture | null = null;
   private locTex: WebGLUniformLocation | null = null;
+  private locTime: WebGLUniformLocation | null = null;
   private buf: WebGLBuffer | null = null;
   private posLoc = -1;
   private ready = false;
@@ -122,6 +129,7 @@ class RgbSplitRenderer {
     this.tex = tex;
     this.buf = buf;
     this.locTex = gl.getUniformLocation(program, "u_tex");
+    this.locTime = gl.getUniformLocation(program, "u_time");
     this.ready = true;
     return true;
   }
@@ -155,6 +163,7 @@ class RgbSplitRenderer {
     gl.vertexAttribPointer(this.posLoc, 2, gl.FLOAT, false, 0, 0);
 
     if (this.locTex) gl.uniform1i(this.locTex, 0);
+    if (this.locTime) gl.uniform1f(this.locTime, performance.now() * 0.001);
 
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
