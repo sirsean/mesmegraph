@@ -16,7 +16,7 @@ export const SPEC_LIST: readonly SpecDefinition[] = [
     title: "Hyperspec",
     subtitle: "Multi-planar optics · spectral ghosting",
     preview:
-      "linear-gradient(125deg, #1c2030 0%, #354560 35%, #6a8a78 70%, #c9a86c 100%)",
+      "linear-gradient(125deg, #1a1428 0%, #4a2068 32%, #2d8f7a 58%, #e8c547 100%)",
   },
   {
     id: "inv",
@@ -40,7 +40,7 @@ export const SPEC_LIST: readonly SpecDefinition[] = [
     title: "False heat",
     subtitle: "Planar temperature map",
     preview:
-      "linear-gradient(135deg, #1a1030 0%, #602050 45%, #c08040 85%, #e8d060 100%)",
+      "linear-gradient(135deg, #0a2820 0%, #2d6b5a 38%, #e8c547 72%, #e85a8c 100%)",
   },
 ] as const;
 

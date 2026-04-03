@@ -16,6 +16,25 @@
   margin-bottom: 1.5rem;
   padding-bottom: 0.85rem;
   border-bottom: 1px solid var(--color-border);
+  position: relative;
+}
+
+/* Deck “signal stripe” — uses mineral teal + signal pink + brass accent */
+.top-bar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-mineral-teal) 70%, transparent) 0%,
+    color-mix(in srgb, var(--color-accent) 75%, transparent) 42%,
+    color-mix(in srgb, var(--color-signal-pink) 65%, transparent) 100%
+  );
+  opacity: 0.9;
+  pointer-events: none;
 }
 
 .top-bar__left {
@@ -41,8 +60,8 @@
 }
 
 .nav-pill:hover {
-  color: var(--color-fg);
-  border-color: var(--color-accent);
+  color: var(--color-signal-pink);
+  border-color: var(--color-mineral-teal);
 }
 
 .nav-pill:focus-visible {
@@ -78,10 +97,11 @@
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--text-title);
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-weight: 400;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   line-height: 1.05;
+  color: var(--color-cream);
 }
 
 .primary-btn {
@@ -91,11 +111,11 @@
   padding: 0.65rem 1.25rem;
   font-family: var(--font-display);
   font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  font-weight: 400;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
-  color: var(--color-cream);
+  color: var(--color-on-accent);
   background: var(--color-accent);
   border: 1px solid var(--color-accent-dim);
   border-radius: 2px;
@@ -129,13 +149,31 @@
 }
 
 .deck__heading {
+  position: relative;
   margin: 0 0 1rem;
   font-family: var(--font-display);
   font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-weight: 400;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-fg);
+  color: var(--color-cream);
+  padding-bottom: 0.55rem;
+}
+
+.deck__heading::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: min(100%, 14rem);
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-mineral-teal) 85%, transparent),
+    color-mix(in srgb, var(--color-signal-pink) 80%, transparent)
+  );
+  opacity: 0.88;
 }
 
 .deck__grid {
@@ -174,7 +212,7 @@
 .ghost-btn {
   border: 1px solid var(--color-border-strong);
   background: var(--color-void-elevated);
-  color: var(--color-fg);
+  color: var(--color-cream);
   padding: 0.55rem 1rem;
   font-size: var(--text-small);
   font-family: var(--font-mono);
@@ -224,10 +262,11 @@ a.ghost-btn {
   margin: 0 0 0.5rem;
   font-family: var(--font-display);
   font-size: clamp(1.35rem, 4vw, 1.75rem);
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   line-height: 1.1;
+  color: var(--color-cream);
 }
 
 .camera__meta {
@@ -252,9 +291,12 @@ a.ghost-btn {
   aspect-ratio: 3 / 4;
   max-height: min(70dvh, 520px);
   margin: 0 auto 1.25rem;
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid color-mix(in srgb, var(--color-mineral-teal) 35%, var(--color-border-strong));
   border-radius: 2px;
-  box-shadow: var(--shadow-card);
+  box-shadow:
+    var(--shadow-card),
+    0 0 0 1px color-mix(in srgb, var(--color-signal-pink) 18%, transparent),
+    inset 0 0 32px color-mix(in srgb, var(--color-mineral-teal) 6%, transparent);
   overflow: hidden;
   background-color: var(--color-void-elevated);
 }
@@ -316,11 +358,10 @@ a.ghost-btn {
   margin: 0;
   font-family: var(--font-display);
   font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
+  font-weight: 400;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-cream);
-  opacity: 0.92;
 }
 
 .camera__viewport-sub {
@@ -345,7 +386,7 @@ a.ghost-btn {
   padding: 0.5rem 1.25rem;
   font-family: var(--font-display);
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }

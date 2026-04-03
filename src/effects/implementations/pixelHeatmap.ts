@@ -6,23 +6,39 @@ function luma(r: number, g: number, b: number): number {
   return 0.299 * r + 0.587 * g + 0.114 * b;
 }
 
-/** Map 0..1 to cold → hot false color. */
+/** Map 0..1 — deck thermal strip: deep mineral teal → lime → gold → orange → hot pink peak. */
 function heatColor(t: number): [number, number, number] {
   const x = Math.min(1, Math.max(0, t));
-  if (x < 0.25) {
-    const u = x / 0.25;
-    return [0, Math.round(40 + u * 180), Math.round(80 + u * 175)];
+  if (x < 0.22) {
+    const u = x / 0.22;
+    return [
+      Math.round(8 + u * 32),
+      Math.round(42 + u * 78),
+      Math.round(58 + u * 62),
+    ];
   }
-  if (x < 0.5) {
-    const u = (x - 0.25) / 0.25;
-    return [0, Math.round(220 * (1 - u) + 40 * u), Math.round(255 * (1 - u) + 60 * u)];
+  if (x < 0.45) {
+    const u = (x - 0.22) / 0.23;
+    return [
+      Math.round(40 + u * 125),
+      Math.round(120 + u * 128),
+      Math.round(120 + u * 35),
+    ];
   }
-  if (x < 0.75) {
-    const u = (x - 0.5) / 0.25;
-    return [Math.round(255 * u), Math.round(255 * (1 - u * 0.5)), 0];
+  if (x < 0.68) {
+    const u = (x - 0.45) / 0.23;
+    return [
+      Math.round(165 + u * 85),
+      Math.round(248 - u * 45),
+      Math.round(155 - u * 155),
+    ];
   }
-  const u = (x - 0.75) / 0.25;
-  return [255, Math.round(60 * (1 - u)), 0];
+  if (x < 0.88) {
+    const u = (x - 0.68) / 0.2;
+    return [255, Math.round(203 - u * 118), Math.round(u * 35)];
+  }
+  const u = (x - 0.88) / 0.12;
+  return [255, Math.round(85 * (1 - u)), Math.round(35 + u * 175)];
 }
 
 function apply(c: PreviewContext): void {

@@ -21,7 +21,7 @@ export function applyThemeToDocument(theme: Theme) {
   }
   const meta = document.getElementById("meta-theme-color") as HTMLMetaElement | null;
   if (meta) {
-    meta.content = theme === "dark" ? "#0c0b0a" : "#e9e4db";
+    meta.content = theme === "dark" ? "#1a1a1a" : "#e9e4db";
   }
 }
 

@@ -64,18 +64,19 @@
   font-size: var(--text-label);
   font-weight: 600;
   letter-spacing: var(--track-wide);
-  color: var(--color-dim);
+  color: var(--color-mineral-teal);
+  transition: color 0.2s ease;
 }
 
 .spec-card__title {
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(0.95rem, 2.8vw, 1.1rem);
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   line-height: 1.2;
-  color: var(--color-fg);
+  color: var(--color-cream);
 }
 
 .spec-card__body {
@@ -105,4 +106,8 @@
 
 .spec-card:hover .spec-card__title {
   color: var(--color-accent);
+}
+
+.spec-card:hover .spec-card__code {
+  color: var(--color-signal-pink);
 }

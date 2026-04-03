@@ -16,15 +16,15 @@ const GHOST_HISTORY = 0.86;
 /** How strongly each new spectral frame burns into the ghost buffer. */
 const GHOST_REFRESH = 0.52;
 
-/** Multi-stop spectral / surreal luma map (signature Hyperspec look). */
+/** Multi-stop spectral luma map — pitch-deck mineral scan: violet → magenta → teal → signal yellow. */
 const STOPS: readonly { t: number; rgb: readonly [number, number, number] }[] = [
-  { t: 0, rgb: [10, 0, 40] },
-  { t: 0.18, rgb: [45, 0, 95] },
-  { t: 0.36, rgb: [160, 25, 175] },
-  { t: 0.52, rgb: [35, 195, 225] },
-  { t: 0.68, rgb: [255, 95, 35] },
-  { t: 0.82, rgb: [255, 235, 140] },
-  { t: 1, rgb: [230, 255, 255] },
+  { t: 0, rgb: [12, 14, 28] },
+  { t: 0.14, rgb: [38, 18, 88] },
+  { t: 0.3, rgb: [175, 45, 155] },
+  { t: 0.46, rgb: [32, 155, 148] },
+  { t: 0.62, rgb: [255, 125, 48] },
+  { t: 0.78, rgb: [255, 210, 88] },
+  { t: 1, rgb: [238, 252, 248] },
 ];
 
 function lerp(a: number, b: number, u: number): number {
@@ -66,10 +66,10 @@ function applySpectralAndVignette(
     const g = rgb[1];
     let b = rgb[2];
 
-    /* Surreal horizontal phase — faint “interference” bands. */
+    /* Surreal horizontal phase — faint “interference” bands (HUD scan). */
     const wave = Math.sin(y * 0.11 + x * 0.03) * 10;
-    r = Math.min(255, Math.max(0, r + wave * 0.4));
-    b = Math.min(255, Math.max(0, b + wave * 0.35));
+    r = Math.min(255, Math.max(0, r + wave * 0.44));
+    b = Math.min(255, Math.max(0, b + wave * 0.38));
 
     /* Vignette — darker toward edges, stronger in shadows. */
     const nx = x / bw - 0.5;
@@ -77,9 +77,13 @@ function applySpectralAndVignette(
     const d = Math.min(1, nx * nx + ny * ny);
     const vig = 0.42 + 0.58 * (1 - d * 1.15) * (0.55 + 0.45 * (L / 255));
 
-    data[p] = Math.round(r * vig);
-    data[p + 1] = Math.round(g * vig);
-    data[p + 2] = Math.round(b * vig);
+    /* Posterized sensor dither — breaks banding, reads like printed deck grain. */
+    const di = ((x * 73 + y * 37) & 7) - 3;
+    const j = di * 0.55;
+
+    data[p] = Math.round(Math.min(255, Math.max(0, r * vig + j)));
+    data[p + 1] = Math.round(Math.min(255, Math.max(0, g * vig + j * 0.85)));
+    data[p + 2] = Math.round(Math.min(255, Math.max(0, b * vig + j * 0.9)));
   }
 }
 
