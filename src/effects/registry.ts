@@ -17,6 +17,7 @@ const effectLoaders: ReadonlyMap<string, EffectLoader> = new Map([
   ["heat", () => import("./implementations/pixelHeatmap").then((m) => m.heatmapEffect)],
   ["gl", () => import("./webgl/rgbSplitPass").then((m) => m.rgbSplitEffect)],
   ["lut", () => import("./webgl/lut3dPass").then((m) => m.lutGradeEffect)],
+  ["kale", () => import("./webgl/kaleidoscopeMosaicPass").then((m) => m.kaleidoscopeEffect)],
 ]);
 
 /**

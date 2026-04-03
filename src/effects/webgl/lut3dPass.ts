@@ -1,4 +1,5 @@
 import { drawVideoCover } from "../../camera/drawVideoCover";
+import { loseWebGLContext } from "./loseWebGLContext";
 import type { Effect, PreviewContext } from "../types";
 import { captureMirrorsPreview } from "../types";
 
@@ -311,6 +312,7 @@ class Lut3dRenderer {
     if (gl && this.lutTex) gl.deleteTexture(this.lutTex);
     if (gl && this.buf) gl.deleteBuffer(this.buf);
     if (gl && this.program) gl.deleteProgram(this.program);
+    loseWebGLContext(gl);
     this.videoTex = null;
     this.lutTex = null;
     this.buf = null;

@@ -162,14 +162,9 @@ export const CameraPreview = forwardRef<CameraPreviewHandle, CameraPreviewProps>
         cancelAnimationFrame(rafId);
         stopRvfc();
         effect.dispose();
-      };
-    }, [videoRef, effect]);
-
-    useEffect(() => {
-      return () => {
         disposePostLayers();
       };
-    }, []);
+    }, [videoRef, effect]);
 
     return (
       <div ref={stageRef} className="camera-preview">

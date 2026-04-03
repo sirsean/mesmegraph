@@ -1,4 +1,5 @@
 import { drawVideoCover } from "../../camera/drawVideoCover";
+import { loseWebGLContext } from "./loseWebGLContext";
 import type { Effect, PreviewContext } from "../types";
 import { captureMirrorsPreview } from "../types";
 
@@ -176,6 +177,7 @@ class RgbSplitRenderer {
     if (gl && this.tex) gl.deleteTexture(this.tex);
     if (gl && this.buf) gl.deleteBuffer(this.buf);
     if (gl && this.program) gl.deleteProgram(this.program);
+    loseWebGLContext(gl);
     this.tex = null;
     this.buf = null;
     this.program = null;

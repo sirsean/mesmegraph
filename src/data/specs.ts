@@ -8,7 +8,7 @@ export type SpecDefinition = {
 
 export const DEFAULT_SPEC_ID = "hyp";
 
-/** Five signature specs — deck order is display order. */
+/** Six signature specs — deck order is display order. */
 export const SPEC_LIST: readonly SpecDefinition[] = [
   {
     id: "hyp",
@@ -49,6 +49,14 @@ export const SPEC_LIST: readonly SpecDefinition[] = [
     subtitle: "3D cube · trilinear remap",
     preview:
       "linear-gradient(118deg, #2a1810 0%, #6b3a22 32%, #b87333 58%, #d4a574 100%)",
+  },
+  {
+    id: "kale",
+    code: "06",
+    title: "Prismatic lattice",
+    subtitle: "Voronoi panes · luma-chased hues",
+    preview:
+      "conic-gradient(from 45deg at 50% 50%, #4a2068 0deg, #2d8f7a 72deg, #e8c547 144deg, #e85a8c 216deg, #3d8f7a 288deg, #4a2068 360deg)",
   },
 ] as const;
 

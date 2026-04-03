@@ -4,7 +4,7 @@
  */
 export type PostLayerContext = {
   video: HTMLVideoElement;
-  /** Base spec id (`hyp`, `gl`, …) so layers can branch (e.g. wireframe from raw video for glitch). */
+  /** Base spec id (`hyp`, `gl`, …) so layers can branch (e.g. wireframe from raw video for glitch / kale). */
   effectId: string;
   /** 0 = no wireframe overlay; 1 = full strength. Omitted defaults to 1. */
   wireframeStrength?: number;

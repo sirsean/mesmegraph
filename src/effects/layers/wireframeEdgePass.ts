@@ -1,4 +1,5 @@
 import { drawVideoCover } from "../../camera/drawVideoCover";
+import { loseWebGLContext } from "../webgl/loseWebGLContext";
 import type { PostLayer, PostLayerContext } from "./types";
 
 const VERT = `
@@ -165,29 +166,42 @@ class WireframeEdgeRenderer {
     const ch = source.height;
     if (cw <= 0 || ch <= 0) return;
 
-    if (canvas.width !== cw || canvas.height !== ch) {
-      canvas.width = cw;
-      canvas.height = ch;
+    /*
+     * WebGL lenses (`gl`, `kale`) render at floor(logical)×floor(logical) then drawImage to
+     * (width,height). Raw-video Sobel must use that same intermediate size and cover math so edge
+     * lines register on the same pixel grid as the graded image; using the full device bitmap
+     * shifted traces vs the preview.
+     */
+    const wEff = Math.max(1, Math.floor(width));
+    const hEff = Math.max(1, Math.floor(height));
+    const useLensRaster =
+      context.effectId === "gl" || context.effectId === "kale";
+    const rw = useLensRaster ? wEff : cw;
+    const rh = useLensRaster ? hEff : ch;
+
+    if (canvas.width !== rw || canvas.height !== rh) {
+      canvas.width = rw;
+      canvas.height = rh;
     }
-    if (copy.width !== cw || copy.height !== ch) {
-      copy.width = cw;
-      copy.height = ch;
+    if (copy.width !== rw || copy.height !== rh) {
+      copy.width = rw;
+      copy.height = rh;
     }
 
     const cctx = copy.getContext("2d", { alpha: false });
     if (!cctx) return;
     cctx.setTransform(1, 0, 0, 1, 0, 0);
     /*
-     * Glitch slit shifts RGB per band — Sobel sees those as edges. For `gl`, run edges on the
-     * raw video (same cover geometry as the filter) so only real scene structure wires up.
+     * Voronoi / RGB-slit borders are false edges on the graded bitmap; Sobel from raw video.
+     * Raster matches lens internal size (see above) so overlay aligns with the stack output.
      */
-    if (context.effectId === "gl") {
-      drawVideoCover(cctx, context.video, cw, ch);
+    if (useLensRaster) {
+      drawVideoCover(cctx, context.video, rw, rh);
     } else {
       cctx.drawImage(source, 0, 0);
     }
 
-    gl.viewport(0, 0, cw, ch);
+    gl.viewport(0, 0, rw, rh);
     gl.bindTexture(gl.TEXTURE_2D, this.tex);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, copy);
@@ -202,7 +216,7 @@ class WireframeEdgeRenderer {
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.tex);
     if (this.locTex) gl.uniform1i(this.locTex, 0);
-    if (this.locTexel) gl.uniform2f(this.locTexel, 1 / cw, 1 / ch);
+    if (this.locTexel) gl.uniform2f(this.locTexel, 1 / rw, 1 / rh);
     if (this.locEdgeColor) gl.uniform3f(this.locEdgeColor, EDGE_RGB[0], EDGE_RGB[1], EDGE_RGB[2]);
     if (this.locGain) gl.uniform1f(this.locGain, 1.35);
 
@@ -224,6 +238,7 @@ class WireframeEdgeRenderer {
     if (gl && this.tex) gl.deleteTexture(this.tex);
     if (gl && this.buf) gl.deleteBuffer(this.buf);
     if (gl && this.program) gl.deleteProgram(this.program);
+    loseWebGLContext(gl);
     this.tex = null;
     this.buf = null;
     this.program = null;
