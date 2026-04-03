@@ -1,0 +1,137 @@
+/* Hyperspec / Mesmegraph design tokens — dark-first, optional light */
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-void: #0c0b0a;
+  --color-void-elevated: #141210;
+  --color-cream: #e8e2d8;
+  --color-fg: #ebe5da;
+  --color-muted: #a39a8c;
+  --color-dim: #6b645a;
+  --color-border: #2c2824;
+  --color-border-strong: #3d3832;
+  --color-accent: #c9a86c;
+  --color-accent-dim: #8a7348;
+  --color-glow: rgba(201, 168, 108, 0.12);
+
+  --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.45);
+  --noise-opacity: 0.055;
+
+  --meta-theme-color: #0c0b0a;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --color-void: #e9e4db;
+  --color-void-elevated: #ddd8cf;
+  --color-cream: #1c1916;
+  --color-fg: #1c1916;
+  --color-muted: #5c564d;
+  --color-dim: #7a7268;
+  --color-border: #c4bdb2;
+  --color-border-strong: #a69e91;
+  --color-accent: #7a5c28;
+  --color-accent-dim: #5c451c;
+  --color-glow: rgba(122, 92, 40, 0.15);
+
+  --shadow-card: 0 10px 28px rgba(28, 25, 22, 0.12);
+  --noise-opacity: 0.035;
+
+  --meta-theme-color: #e9e4db;
+}
+
+:root {
+  --font-display: "Chakra Petch", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+
+  --text-label: 0.65rem;
+  --text-small: 0.8125rem;
+  --text-body: 1rem;
+  --text-title: clamp(1.85rem, 5.5vw, 2.35rem);
+  --track-wide: 0.22em;
+  --track-label: 0.18em;
+
+  font-family: var(--font-display);
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--color-fg);
+  background-color: var(--color-void);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100dvh;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background-color: var(--color-void);
+  position: relative;
+}
+
+/* Subtle paper / emulsion grain */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: var(--noise-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* Scanline hint — very light, respects reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 3px
+    );
+    opacity: 0.35;
+  }
+}
+
+:root[data-theme="light"] body::after {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.02) 2px,
+    rgba(0, 0, 0, 0.02) 3px
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after {
+    display: none;
+  }
+}
+
+#root {
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
