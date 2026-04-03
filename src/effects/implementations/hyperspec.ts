@@ -2,19 +2,37 @@ import { drawVideoCover } from "../../camera/drawVideoCover";
 import type { Effect, PreviewContext } from "../types";
 import { captureMirrorsPreview } from "../types";
 
-/** Primary ghost layer drawn under the current frame. */
-const GHOST_MAIN = 0.72;
-/** Side echoes (horizontal) — reads as chromatic / slit trails. */
-const GHOST_WING = 0.28;
-/** Faint vertical echo. */
-const GHOST_DRIFT = 0.18;
 /**
- * Ghost buffer persistence: how much of the previous ghost image remains before
- * mixing in the new spectral frame (heavier trails that smear across time).
+ * Wireframe / edge detection (future work): run a Sobel or Scharr pass on video luma
+ * (WebGL fragment shader or small getImageData kernel), threshold magnitude, and draw
+ * edges in a neon color (e.g. mineral teal / signal pink) with additive or screen blend
+ * over the spectral frame — or ship as a separate spec / `hyp` variant. Canvas 2D has no
+ * built-in edge filter; WebGL one full-screen pass is the practical path.
  */
-const GHOST_HISTORY = 0.86;
+
+/** Primary ghost layer drawn under the current spectral (offset stack). */
+const GHOST_MAIN = 0.88;
+/** Side echoes (horizontal); strong so motion reads at the fringes. */
+const GHOST_WING = 0.48;
+/** Vertical echo. */
+const GHOST_DRIFT = 0.36;
+/**
+ * Ghost buffer persistence — higher = longer after-image (history lingers many frames).
+ * Lower refresh so new frames don’t wipe the buffer each tick.
+ */
+const GHOST_HISTORY = 0.968;
 /** How strongly each new spectral frame burns into the ghost buffer. */
-const GHOST_REFRESH = 0.52;
+const GHOST_REFRESH = 0.14;
+/** Previous-frame spectral for double exposure. */
+const DOUBLE_EXPOSURE_ALPHA = 0.42;
+/** Slight translucency on the sharp layer so history isn’t fully occluded in the center. */
+const WORK_ALPHA = 0.88;
+/** Screen full ghost on top of the sharp pass — makes trails obvious without only relying on offsets. */
+const GHOST_SCREEN_OVERLAY = 0.34;
+/** Additive veil after screen (phosphor). */
+const AFTERIMAGE_VEIL = 0.14;
+/** Wing offset as fraction of width — wider = more visible fringe. */
+const WING_FRAC = 0.014;
 
 /** Multi-stop spectral luma map — pitch-deck mineral scan: violet → magenta → teal → signal yellow. */
 const STOPS: readonly { t: number; rgb: readonly [number, number, number] }[] = [
@@ -99,9 +117,12 @@ class HyperspecRenderer {
   private ghost: HTMLCanvasElement | null = null;
   private trail: HTMLCanvasElement | null = null;
   private comp: HTMLCanvasElement | null = null;
+  /** One-frame-delayed spectral output for double exposure overlay. */
+  private exposureLag: HTMLCanvasElement | null = null;
   private bw = 0;
   private bh = 0;
   private hasGhost = false;
+  private hasExposureLag = false;
 
   private ensure(bw: number, bh: number): void {
     if (this.bw === bw && this.bh === bh && this.work) return;
@@ -111,7 +132,9 @@ class HyperspecRenderer {
     this.ghost = makeCanvas(bw, bh);
     this.trail = makeCanvas(bw, bh);
     this.comp = makeCanvas(bw, bh);
+    this.exposureLag = makeCanvas(bw, bh);
     this.hasGhost = false;
+    this.hasExposureLag = false;
   }
 
   apply(c: PreviewContext): void {
@@ -150,7 +173,7 @@ class HyperspecRenderer {
     cctx.fillRect(0, 0, bw, bh);
 
     if (this.hasGhost) {
-      const off = Math.max(3, Math.round(bw * 0.007));
+      const off = Math.max(6, Math.round(bw * WING_FRAC));
       cctx.globalAlpha = GHOST_WING;
       cctx.drawImage(ghost, -off, 0);
       cctx.drawImage(ghost, off, 0);
@@ -159,10 +182,44 @@ class HyperspecRenderer {
       cctx.globalAlpha = GHOST_MAIN;
       cctx.drawImage(ghost, 0, 0);
     }
-    cctx.globalAlpha = 1;
+
+    /* Double exposure: screen-blend last frame’s spectral so scenes stack like multi-exposure film. */
+    if (this.hasExposureLag) {
+      const lag = this.exposureLag!;
+      const t = performance.now() * 0.00035;
+      const ox = Math.round(Math.sin(t) * bw * 0.005);
+      const oy = Math.round(Math.cos(t * 0.73) * bh * 0.004);
+      cctx.globalCompositeOperation = "screen";
+      cctx.globalAlpha = DOUBLE_EXPOSURE_ALPHA;
+      cctx.drawImage(lag, ox, oy);
+      cctx.globalCompositeOperation = "source-over";
+    }
+
+    cctx.globalAlpha = WORK_ALPHA;
     cctx.drawImage(work, 0, 0);
+    cctx.globalAlpha = 1;
+
+    /* Registered ghost on top — otherwise opaque “work” hides history in the frame center. */
+    if (this.hasGhost) {
+      cctx.globalCompositeOperation = "screen";
+      cctx.globalAlpha = GHOST_SCREEN_OVERLAY;
+      cctx.drawImage(ghost, 0, 0);
+      cctx.globalCompositeOperation = "lighter";
+      cctx.globalAlpha = AFTERIMAGE_VEIL;
+      cctx.drawImage(ghost, 0, 0);
+      cctx.globalCompositeOperation = "source-over";
+      cctx.globalAlpha = 1;
+    }
 
     ctx.drawImage(comp, 0, 0, width, height);
+
+    /* Save this frame’s spectral for next frame’s double exposure. */
+    const ectx = this.exposureLag!.getContext("2d", { alpha: false });
+    if (ectx) {
+      ectx.globalCompositeOperation = "copy";
+      ectx.drawImage(work, 0, 0);
+      this.hasExposureLag = true;
+    }
 
     /* Snapshot ghost before overwriting — used for temporal persistence. */
     tctx.globalCompositeOperation = "copy";
@@ -184,9 +241,11 @@ class HyperspecRenderer {
     this.ghost = null;
     this.trail = null;
     this.comp = null;
+    this.exposureLag = null;
     this.bw = 0;
     this.bh = 0;
     this.hasGhost = false;
+    this.hasExposureLag = false;
   }
 }
 
