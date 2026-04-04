@@ -9,21 +9,17 @@ import { GalleryPage } from "./pages/GalleryPage";
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route
-          element={
-            <GalleryFillProvider>
-              <AppShell />
-            </GalleryFillProvider>
-          }
-        >
-          <Route path="/" element={<DeckPage />} />
-          <Route path="/camera" element={<CameraRedirectPage />} />
-          <Route path="/camera/:specId" element={<CameraPage />} />
-          <Route path="/gallery" element={<GalleryPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
+      <GalleryFillProvider>
+        <Routes>
+          <Route element={<AppShell />}>
+            <Route path="/" element={<DeckPage />} />
+            <Route path="/camera" element={<CameraRedirectPage />} />
+            <Route path="/camera/:specId" element={<CameraPage />} />
+            <Route path="/gallery" element={<GalleryPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </GalleryFillProvider>
     </BrowserRouter>
   );
 }
