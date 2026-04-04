@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { downloadBlob } from "../camera/saveCapture";
+import { useGalleryFill } from "../context/GalleryFillContext";
 import {
   deleteGalleryCapture,
   getGalleryBlob,
@@ -60,6 +61,7 @@ function GalleryThumb({
 }
 
 export function GalleryPage() {
+  const { refreshGalleryFill } = useGalleryFill();
   const [items, setItems] = useState<GalleryCaptureMeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState<{
@@ -73,11 +75,12 @@ export function GalleryPage() {
       if (cancelled) return;
       setItems(list);
       setLoading(false);
+      void refreshGalleryFill(list.length);
     });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshGalleryFill]);
 
   const openLightbox = useCallback(async (meta: GalleryCaptureMeta) => {
     const blob = await getGalleryBlob(meta.id);
@@ -108,9 +111,12 @@ export function GalleryPage() {
     async (id: string) => {
       await deleteGalleryCapture(id);
       closeLightbox();
-      void listGalleryMeta().then(setItems);
+      void listGalleryMeta().then((list) => {
+        setItems(list);
+        void refreshGalleryFill(list.length);
+      });
     },
-    [closeLightbox],
+    [closeLightbox, refreshGalleryFill],
   );
 
   return (

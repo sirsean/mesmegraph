@@ -1,10 +1,14 @@
 .shell {
+  --gd: var(--gallery-degrade, 0);
+  position: relative;
   width: 100%;
   max-width: 72rem;
   margin: 0 auto;
   padding: clamp(1rem, 3vw, 1.75rem);
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
   text-align: left;
+  filter: hue-rotate(calc(var(--gd) * 14deg)) contrast(calc(1 + var(--gd) * 0.18))
+    saturate(calc(1 - var(--gd) * 0.2));
 }
 
 .top-bar {
@@ -821,4 +825,377 @@ a.ghost-btn {
 
 .gallery__modal-delete:hover {
   border-color: var(--color-signal-pink);
+}
+
+/* ——— Storage degradation (gallery fullness → glitch / signal loss) ——— */
+
+.shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: calc(var(--gd) * 0.16);
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 2px,
+    color-mix(in srgb, var(--color-void) 55%, transparent) 2px,
+    color-mix(in srgb, var(--color-void) 55%, transparent) 3px
+  );
+  mix-blend-mode: multiply;
+}
+
+.shell--storage-tension .top-bar {
+  --degrade-nudge: calc(var(--gd) * 3px);
+  --degrade-skew: calc(var(--gd) * 2.2deg);
+  animation: degrade-bar calc(1.05s - var(--gd) * 0.55s) steps(3, end) infinite;
+}
+
+@keyframes degrade-bar {
+  0%,
+  100% {
+    transform: translateX(0) skewX(0deg);
+  }
+  33% {
+    transform: translateX(var(--degrade-nudge)) skewX(var(--degrade-skew));
+  }
+  66% {
+    transform: translateX(calc(-1 * var(--degrade-nudge))) skewX(calc(-1 * var(--degrade-skew)));
+  }
+}
+
+.shell--storage-tension .machine-readout {
+  text-shadow:
+    calc(var(--gd) * 2px) 0 color-mix(in srgb, var(--color-signal-pink) 72%, transparent),
+    calc(var(--gd) * -2px) 0 color-mix(in srgb, var(--color-mineral-teal) 65%, transparent),
+    0 calc(var(--gd) * 1px) color-mix(in srgb, var(--color-accent) 40%, transparent);
+  animation: degrade-readout calc(2.4s - var(--gd) * 1.4s) steps(2, end) infinite;
+}
+
+@keyframes degrade-readout {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: calc(1 - var(--gd) * 0.22);
+  }
+}
+
+.shell--storage-tension .nav-pill {
+  box-shadow:
+    calc(var(--gd) * 3px) calc(var(--gd) * 1px) 0
+      color-mix(in srgb, var(--color-accent) calc(25% + var(--gd) * 35%), transparent),
+    calc(var(--gd) * -2px) calc(var(--gd) * -1px) 0
+      color-mix(in srgb, var(--color-signal-pink) calc(15% + var(--gd) * 25%), transparent);
+  border-radius: calc(1px + var(--gd) * 3px) 1px calc(1px + var(--gd) * 2px) 1px;
+}
+
+.shell--storage-tension .top-bar::after {
+  opacity: calc(0.55 + var(--gd) * 0.45);
+  filter: blur(calc(var(--gd) * 0.35px));
+  transform: translateX(calc(var(--gd) * 2px));
+}
+
+/* Display titles — stronger channel split */
+.shell--storage-tension .hero h1,
+.shell--storage-tension .camera__title,
+.shell--storage-tension .gallery__title,
+.shell--storage-tension .deck__heading,
+.shell--storage-tension .spec-card__title,
+.shell--storage-tension .camera__viewport-label {
+  text-shadow:
+    calc(var(--gd) * 2.5px) 0 color-mix(in srgb, var(--color-signal-pink) 68%, transparent),
+    calc(var(--gd) * -2.5px) 0 color-mix(in srgb, var(--color-mineral-teal) 62%, transparent),
+    0 calc(var(--gd) * 1.5px) color-mix(in srgb, var(--color-accent) 35%, transparent);
+  animation: degrade-readout calc(2.8s - var(--gd) * 1.5s) steps(2, end) infinite;
+}
+
+/* Section labels & mono readouts */
+.shell--storage-tension .eyebrow,
+.shell--storage-tension .camera__code,
+.shell--storage-tension .camera__id,
+.shell--storage-tension .camera__viewport-sub,
+.shell--storage-tension .camera__viewport-error,
+.shell--storage-tension .camera__capture-notice,
+.shell--storage-tension .camera__wireframe-label,
+.shell--storage-tension .camera__wireframe-readout,
+.shell--storage-tension .camera__wireframe-tick-label,
+.shell--storage-tension .gallery__status,
+.shell--storage-tension .gallery__empty,
+.shell--storage-tension .gallery__card-spec,
+.shell--storage-tension .gallery__card-time,
+.shell--storage-tension .theme-toggle__label,
+.shell--storage-tension .theme-toggle__mono,
+.shell--storage-tension .spec-card__code {
+  text-shadow:
+    calc(var(--gd) * 1.5px) 0 color-mix(in srgb, var(--color-signal-pink) 55%, transparent),
+    calc(var(--gd) * -1.5px) 0 color-mix(in srgb, var(--color-mineral-teal) 50%, transparent);
+  animation: degrade-readout calc(3.2s - var(--gd) * 1.2s) steps(2, end) infinite;
+}
+
+.shell--storage-tension .deck__heading::after {
+  opacity: calc(0.5 + var(--gd) * 0.48);
+  filter: blur(calc(var(--gd) * 0.45px));
+  transform: translateX(calc(var(--gd) * 3px)) scaleX(calc(1 + var(--gd) * 0.04));
+}
+
+/* Ghost & primary actions + theme control */
+.shell--storage-tension .ghost-btn,
+.shell--storage-tension .primary-btn,
+.shell--storage-tension .theme-toggle {
+  box-shadow:
+    calc(var(--gd) * 3px) calc(var(--gd) * 1px) 0
+      color-mix(in srgb, var(--color-accent) calc(18% + var(--gd) * 32%), transparent),
+    calc(var(--gd) * -2px) calc(var(--gd) * -1px) 0
+      color-mix(in srgb, var(--color-signal-pink) calc(12% + var(--gd) * 22%), transparent);
+  border-radius: calc(1px + var(--gd) * 2px) calc(1px + var(--gd) * 1px) calc(1px + var(--gd) * 3px)
+    calc(1px + var(--gd) * 1px);
+}
+
+.shell--storage-tension .primary-btn {
+  box-shadow:
+    calc(var(--gd) * 4px) calc(var(--gd) * 2px) 0
+      color-mix(in srgb, var(--color-signal-pink) calc(20% + var(--gd) * 28%), transparent),
+    calc(var(--gd) * -3px) calc(var(--gd) * -1px) 0
+      color-mix(in srgb, var(--color-mineral-teal) calc(15% + var(--gd) * 25%), transparent),
+    0 4px 20px var(--color-glow);
+}
+
+.shell--storage-tension .spec-card {
+  transform: skewX(calc(var(--gd) * -0.35deg));
+  box-shadow:
+    var(--shadow-card),
+    calc(var(--gd) * 4px) calc(var(--gd) * 2px) 0
+      color-mix(in srgb, var(--color-accent) calc(10% + var(--gd) * 18%), transparent);
+  border-radius: calc(2px + var(--gd) * 2px) 1px 2px calc(1px + var(--gd) * 3px);
+}
+
+/* Deck stack dashed inner frame: flicker, dropout, and “torn” segments */
+@keyframes degrade-spec-dash-frame {
+  0%,
+  9% {
+    opacity: 0.52;
+    border-style: dashed;
+    clip-path: inset(0 0 0 0);
+    transform: translate(0, 0);
+  }
+  10%,
+  12% {
+    opacity: 0.04;
+    border-style: solid;
+  }
+  13%,
+  15% {
+    opacity: 0.82;
+    border-style: dashed;
+  }
+  22%,
+  24% {
+    opacity: 0.18;
+    clip-path: inset(36% 0 36% 0);
+    border-style: dashed;
+  }
+  25%,
+  28% {
+    clip-path: inset(0 0 0 0);
+    opacity: 0.5;
+  }
+  34%,
+  36% {
+    border-style: none;
+    opacity: 0;
+    clip-path: inset(0 0 0 0);
+  }
+  37%,
+  42% {
+    border-style: dashed;
+    opacity: 0.44;
+  }
+  48%,
+  49% {
+    transform: translate(2px, -1px);
+    opacity: 0.72;
+  }
+  50%,
+  51% {
+    transform: translate(-2px, 1px);
+  }
+  52%,
+  58% {
+    transform: translate(0, 0);
+    border-style: dotted;
+    opacity: 0.35;
+  }
+  59%,
+  65% {
+    border-style: dashed;
+    opacity: 0.55;
+    clip-path: inset(0 14% 0 8%);
+  }
+  66%,
+  70% {
+    clip-path: inset(0 0 0 0);
+  }
+  76%,
+  78% {
+    opacity: 0.02;
+  }
+  79%,
+  82% {
+    opacity: 0.68;
+  }
+  88%,
+  91% {
+    clip-path: inset(18% 22% 20% 10%);
+    opacity: 0.22;
+    border-style: dashed;
+  }
+  92%,
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 0.52;
+    border-style: dashed;
+    transform: translate(0, 0);
+  }
+}
+
+.shell--storage-tension .spec-card::before {
+  animation: degrade-spec-dash-frame calc(2.75s - var(--gd) * 1.2s) linear infinite;
+}
+
+.shell--storage-tension .deck__cell:nth-child(1) .spec-card::before {
+  animation-delay: 0s;
+}
+
+.shell--storage-tension .deck__cell:nth-child(2) .spec-card::before {
+  animation-delay: -0.42s;
+}
+
+.shell--storage-tension .deck__cell:nth-child(3) .spec-card::before {
+  animation-delay: -0.94s;
+}
+
+.shell--storage-tension .deck__cell:nth-child(4) .spec-card::before {
+  animation-delay: -1.38s;
+}
+
+.shell--storage-tension .deck__cell:nth-child(5) .spec-card::before {
+  animation-delay: -1.85s;
+}
+
+.shell--storage-tension .deck__cell:nth-child(6) .spec-card::before {
+  animation-delay: -2.3s;
+}
+
+.shell--storage-tension .gallery__card {
+  box-shadow:
+    var(--shadow-card),
+    calc(var(--gd) * 3px) calc(var(--gd) * 2px) 0
+      color-mix(in srgb, var(--color-signal-pink) calc(12% + var(--gd) * 20%), transparent);
+  border-radius: calc(2px + var(--gd) * 2px) calc(1px + var(--gd) * 3px) 2px 1px;
+}
+
+.shell--storage-tension .camera__viewport {
+  border-color: color-mix(
+    in srgb,
+    var(--color-mineral-teal) calc(35% + var(--gd) * 22%),
+    var(--color-border-strong)
+  );
+  box-shadow:
+    var(--shadow-card),
+    0 0 0 1px color-mix(in srgb, var(--color-signal-pink) calc(18% + var(--gd) * 28%), transparent),
+    inset 0 0 32px color-mix(in srgb, var(--color-mineral-teal) calc(6% + var(--gd) * 10%), transparent),
+    calc(var(--gd) * 5px) calc(var(--gd) * 3px) 0
+      color-mix(in srgb, var(--color-void) calc(40% + var(--gd) * 30%), transparent);
+}
+
+.shell--storage-tension .camera__wireframe-panel {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--color-cream) 7%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, #000 55%, transparent),
+    0 3px 12px rgba(0, 0, 0, 0.38),
+    calc(var(--gd) * 3px) calc(var(--gd) * 2px) 0
+      color-mix(in srgb, var(--color-accent) calc(8% + var(--gd) * 15%), transparent);
+  transform: rotate(calc(var(--gd) * -0.25deg));
+}
+
+.shell--storage-tension .gallery__modal {
+  box-shadow:
+    var(--shadow-card),
+    calc(var(--gd) * 4px) calc(var(--gd) * 3px) 0
+      color-mix(in srgb, var(--color-mineral-teal) calc(14% + var(--gd) * 20%), transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell::after {
+    opacity: calc(var(--gd) * 0.06);
+  }
+
+  .shell--storage-tension .top-bar,
+  .shell--storage-tension .machine-readout,
+  .shell--storage-tension .hero h1,
+  .shell--storage-tension .camera__title,
+  .shell--storage-tension .gallery__title,
+  .shell--storage-tension .deck__heading,
+  .shell--storage-tension .spec-card__title,
+  .shell--storage-tension .camera__viewport-label,
+  .shell--storage-tension .eyebrow,
+  .shell--storage-tension .camera__code,
+  .shell--storage-tension .camera__id,
+  .shell--storage-tension .camera__viewport-sub,
+  .shell--storage-tension .camera__viewport-error,
+  .shell--storage-tension .camera__capture-notice,
+  .shell--storage-tension .camera__wireframe-label,
+  .shell--storage-tension .camera__wireframe-readout,
+  .shell--storage-tension .camera__wireframe-tick-label,
+  .shell--storage-tension .gallery__status,
+  .shell--storage-tension .gallery__empty,
+  .shell--storage-tension .gallery__card-spec,
+  .shell--storage-tension .gallery__card-time,
+  .shell--storage-tension .theme-toggle__label,
+  .shell--storage-tension .theme-toggle__mono,
+  .shell--storage-tension .spec-card__code {
+    animation: none;
+  }
+
+  .shell--storage-tension .machine-readout,
+  .shell--storage-tension .hero h1,
+  .shell--storage-tension .camera__title,
+  .shell--storage-tension .gallery__title,
+  .shell--storage-tension .deck__heading,
+  .shell--storage-tension .spec-card__title,
+  .shell--storage-tension .camera__viewport-label,
+  .shell--storage-tension .eyebrow,
+  .shell--storage-tension .camera__code,
+  .shell--storage-tension .camera__id,
+  .shell--storage-tension .camera__viewport-sub,
+  .shell--storage-tension .camera__viewport-error,
+  .shell--storage-tension .camera__capture-notice,
+  .shell--storage-tension .camera__wireframe-label,
+  .shell--storage-tension .camera__wireframe-readout,
+  .shell--storage-tension .camera__wireframe-tick-label,
+  .shell--storage-tension .gallery__status,
+  .shell--storage-tension .gallery__empty,
+  .shell--storage-tension .gallery__card-spec,
+  .shell--storage-tension .gallery__card-time,
+  .shell--storage-tension .theme-toggle__label,
+  .shell--storage-tension .theme-toggle__mono,
+  .shell--storage-tension .spec-card__code {
+    opacity: 1;
+  }
+
+  .shell--storage-tension .spec-card,
+  .shell--storage-tension .camera__wireframe-panel {
+    transform: none;
+  }
+
+  .shell--storage-tension .spec-card::before {
+    animation: none;
+    clip-path: none;
+    opacity: calc(0.45 + var(--gd) * 0.2);
+    border-style: dashed;
+    transform: none;
+  }
 }

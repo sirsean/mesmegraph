@@ -4,7 +4,7 @@
  * Oldest captures are removed when saving would exceed MAX_GALLERY_CAPTURES.
  */
 
-const MAX_GALLERY_CAPTURES = 12;
+export const MAX_GALLERY_CAPTURES = 12;
 
 const DB_NAME = "mesmegraph-gallery";
 const DB_VERSION = 1;
@@ -111,6 +111,12 @@ export async function listGalleryMeta(): Promise<GalleryCaptureMeta[]> {
   } catch {
     return [];
   }
+}
+
+/** 0–1 based on how many captures are stored vs {@link MAX_GALLERY_CAPTURES}. */
+export async function getGalleryFillRatio(): Promise<number> {
+  const list = await listGalleryMeta();
+  return Math.min(1, list.length / MAX_GALLERY_CAPTURES);
 }
 
 export async function getGalleryBlob(id: string): Promise<Blob | null> {

@@ -1,5 +1,7 @@
+import { useEffect, type CSSProperties } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { useGalleryFill } from "../context/GalleryFillContext";
 import "../App.css";
 
 function routeReadout(pathname: string): string {
@@ -11,9 +13,19 @@ function routeReadout(pathname: string): string {
 
 export function AppShell() {
   const { pathname } = useLocation();
+  const { fillRatio, refreshGalleryFill } = useGalleryFill();
+
+  useEffect(() => {
+    void refreshGalleryFill();
+  }, [pathname, refreshGalleryFill]);
+
+  const tension = fillRatio > 0.001;
 
   return (
-    <div className="shell">
+    <div
+      className={`shell${tension ? " shell--storage-tension" : ""}`}
+      style={{ "--gallery-degrade": String(fillRatio) } as CSSProperties}
+    >
       <div className="top-bar">
         <div className="top-bar__left">
           {pathname !== "/" && (

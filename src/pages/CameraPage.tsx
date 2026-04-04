@@ -7,6 +7,7 @@ import { getSpecById } from "../data/specs";
 import { loadEffect } from "../effects/registry";
 import type { Effect } from "../effects/types";
 import { useCameraStream } from "../hooks/useCameraStream";
+import { useGalleryFill } from "../context/GalleryFillContext";
 import { addCaptureToGallery } from "../storage/captureGallery";
 import { readEdgeTraceStrength, writeEdgeTraceStrength } from "../storage/edgeTraceStrength";
 import { writeSelectedSpecId } from "../storage/selectedSpec";
@@ -34,6 +35,7 @@ type LensResult =
   | { scopeId: string; retry: number; kind: "err"; message: string };
 
 function CameraPageLive({ spec }: { spec: SpecDefinition }) {
+  const { refreshGalleryFill } = useGalleryFill();
   const { title, code, id, preview } = spec;
   const { videoRef, status, errorMessage, retry } = useCameraStream();
   const previewRef = useRef<CameraPreviewHandle>(null);
@@ -106,8 +108,9 @@ function CameraPageLive({ spec }: { spec: SpecDefinition }) {
       }
     } finally {
       setCaptureBusy(false);
+      void refreshGalleryFill();
     }
-  }, [captureBusy, effect, id]);
+  }, [captureBusy, effect, id, refreshGalleryFill]);
 
   const onShareLast = useCallback(async () => {
     const x = lastCaptureRef.current;
