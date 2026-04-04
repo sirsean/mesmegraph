@@ -1,9 +1,15 @@
+import dreamcatcherCard from "../../art/dreamcatcher-card.png";
+import treefingerCard from "../../art/treefinger-card.png";
+import vanaCard from "../../art/vana-card.png";
+
 export type SpecDefinition = {
   id: string;
   code: string;
   title: string;
   subtitle: string;
   preview: string;
+  /** Home deck card art (bundled asset URL). Omitted → CSS `preview` gradient in the card viewport. */
+  deckCardImage?: string;
 };
 
 export const DEFAULT_SPEC_ID = "hyp";
@@ -17,6 +23,7 @@ export const SPEC_LIST: readonly SpecDefinition[] = [
     subtitle: "Multi-planar optics · spectral ghosting",
     preview:
       "linear-gradient(125deg, #1a1428 0%, #4a2068 32%, #2d8f7a 58%, #e8c547 100%)",
+    deckCardImage: dreamcatcherCard,
   },
   {
     id: "inv",
@@ -29,10 +36,11 @@ export const SPEC_LIST: readonly SpecDefinition[] = [
   {
     id: "gl",
     code: "03",
-    title: "Glitch slit",
+    title: "Glitch Slit",
     subtitle: "Buffer tear · RGB shear",
     preview:
       "repeating-linear-gradient(90deg, #1a1a22 0px, #1a1a22 3px, #3a2a40 3px, #3a2a40 6px)",
+    deckCardImage: treefingerCard,
   },
   {
     id: "heat",
@@ -53,14 +61,26 @@ export const SPEC_LIST: readonly SpecDefinition[] = [
   {
     id: "kale",
     code: "06",
-    title: "Prismatic lattice",
+    title: "Prismatic Lattice",
     subtitle: "Voronoi panes · luma-chased hues",
     preview:
       "conic-gradient(from 45deg at 50% 50%, #4a2068 0deg, #2d8f7a 72deg, #e8c547 144deg, #e85a8c 216deg, #3d8f7a 288deg, #4a2068 360deg)",
+    deckCardImage: vanaCard,
   },
 ] as const;
 
 const SPEC_BY_ID = new Map(SPEC_LIST.map((s) => [s.id, s]));
+
+/** Specs shown on the home deck (others stay in `SPEC_LIST` for routes and registry). */
+export const DECK_PAGE_SPEC_ORDER = ["hyp", "gl", "kale"] as const;
+
+export function listDeckPageSpecs(): SpecDefinition[] {
+  return DECK_PAGE_SPEC_ORDER.map((id) => {
+    const s = SPEC_BY_ID.get(id);
+    if (!s) throw new Error(`Missing deck spec: ${id}`);
+    return s;
+  });
+}
 
 export function getSpecById(id: string | undefined): SpecDefinition | undefined {
   if (!id) return undefined;

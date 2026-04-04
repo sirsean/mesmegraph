@@ -14,6 +14,8 @@ export type SpecCardProps = {
   title: string;
   /** Placeholder preview: CSS gradient stops */
   preview?: string;
+  /** Bundled image URL for the card viewport (cover); overrides gradient when set */
+  deckCardImage?: string;
   /** Route to this spec’s camera view */
   cameraTo: string;
   /** Persist last-opened spec for `/camera` redirect */
@@ -35,6 +37,7 @@ export function SpecCard({
   code,
   title,
   preview = "linear-gradient(135deg, var(--color-border-strong) 0%, var(--color-void-elevated) 45%, var(--color-accent-dim) 100%)",
+  deckCardImage,
   cameraTo,
   onOpen,
 }: SpecCardProps) {
@@ -71,7 +74,18 @@ export function SpecCard({
         <h3 className="spec-card__title">{title}</h3>
       </header>
       <div className="spec-card__body">
-        <div className="spec-card__viewport" style={{ background: preview }} />
+        <div
+          className="spec-card__viewport"
+          style={
+            deckCardImage
+              ? {
+                  backgroundImage: `url(${deckCardImage})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }
+              : { background: preview }
+          }
+        />
       </div>
       <Link
         to={cameraTo}
