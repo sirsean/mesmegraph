@@ -25,6 +25,8 @@ type CameraPreviewProps = {
   effect: Effect;
   /** 0–1; wireframe post-layer opacity. Default 1. */
   wireframeStrength?: number;
+  /** 0–1 local gallery fullness; drives black triangle opacity. Default 0. */
+  galleryFillRatio?: number;
 };
 
 const MAX_DPR = 2.5;
@@ -38,13 +40,20 @@ function canDrawVideo(v: HTMLVideoElement): boolean {
 }
 
 export const CameraPreview = forwardRef<CameraPreviewHandle, CameraPreviewProps>(
-  function CameraPreview({ videoRef, effect, wireframeStrength = 1 }, ref) {
+  function CameraPreview(
+    { videoRef, effect, wireframeStrength = 1, galleryFillRatio = 0 },
+    ref,
+  ) {
     const stageRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const wireRef = useRef(wireframeStrength);
+    const fillRef = useRef(galleryFillRatio);
     useLayoutEffect(() => {
       wireRef.current = wireframeStrength;
     }, [wireframeStrength]);
+    useLayoutEffect(() => {
+      fillRef.current = galleryFillRatio;
+    }, [galleryFillRatio]);
 
     useImperativeHandle(
       ref,
@@ -104,6 +113,7 @@ export const CameraPreview = forwardRef<CameraPreviewHandle, CameraPreviewProps>
         runPreviewPass(effect, ctx, v, w, h, {
           wireframeStrength: wireRef.current,
           nowMs: performance.now(),
+          galleryFillRatio: fillRef.current,
         });
       };
 

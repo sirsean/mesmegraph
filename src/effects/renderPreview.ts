@@ -6,6 +6,8 @@ export type PreviewPostOptions = {
   wireframeStrength?: number;
   /** Passed to post layers for time-based overlays (alien whispers). */
   nowMs?: number;
+  /** 0–1 local gallery fullness; drives black triangle visibility. */
+  galleryFillRatio?: number;
 };
 
 /**
@@ -31,6 +33,9 @@ export function runPreviewPass(
       ? { wireframeStrength: options.wireframeStrength }
       : {}),
     ...(options?.nowMs !== undefined ? { nowMs: options.nowMs } : {}),
+    ...(options?.galleryFillRatio !== undefined
+      ? { galleryFillRatio: options.galleryFillRatio }
+      : {}),
   });
   ctx.restore();
 }
@@ -60,6 +65,9 @@ export function runCapturePass(
       ? { wireframeStrength: options.wireframeStrength }
       : {}),
     ...(options?.nowMs !== undefined ? { nowMs: options.nowMs } : {}),
+    ...(options?.galleryFillRatio !== undefined
+      ? { galleryFillRatio: options.galleryFillRatio }
+      : {}),
   });
   ctx.restore();
 }

@@ -35,7 +35,7 @@ type LensResult =
   | { scopeId: string; retry: number; kind: "err"; message: string };
 
 function CameraPageLive({ spec }: { spec: SpecDefinition }) {
-  const { refreshGalleryFill } = useGalleryFill();
+  const { fillRatio, refreshGalleryFill } = useGalleryFill();
   const { title, code, id, preview } = spec;
   const { videoRef, status, errorMessage, retry } = useCameraStream();
   const previewRef = useRef<CameraPreviewHandle>(null);
@@ -148,6 +148,7 @@ function CameraPageLive({ spec }: { spec: SpecDefinition }) {
             videoRef={videoRef}
             effect={effect}
             wireframeStrength={wireframeStrength}
+            galleryFillRatio={fillRatio}
           />
         ) : null}
 

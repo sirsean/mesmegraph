@@ -10,6 +10,8 @@ export type PostLayerContext = {
   wireframeStrength?: number;
   /** Monotonic clock for post layers (e.g. alien whispers). Prefer `performance.now()` from the preview loop. */
   nowMs?: number;
+  /** 0–1 gallery storage fullness (captures / max). Black triangle opacity follows this. */
+  galleryFillRatio?: number;
 };
 
 export type PostLayer = {
