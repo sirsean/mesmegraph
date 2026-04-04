@@ -53,7 +53,7 @@ function randomId(): string {
 }
 
 /**
- * Persists a copy of the capture after download/clipboard (best-effort; failures are silent for callers).
+ * Persists a capture in local gallery storage (best-effort; failures are silent for callers).
  */
 export async function addCaptureToGallery(
   blob: Blob,

@@ -628,19 +628,6 @@ a.ghost-btn {
   cursor: not-allowed;
 }
 
-.camera__share {
-  min-height: 2.75rem;
-  padding: 0.5rem 1rem;
-  font-family: var(--font-mono);
-  font-size: var(--text-small);
-  letter-spacing: 0.06em;
-}
-
-.camera__share:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
 .camera__capture-notice {
   margin: 0 0 1.25rem;
   max-width: 36rem;

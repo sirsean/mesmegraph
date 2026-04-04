@@ -166,7 +166,7 @@ export function GalleryPage() {
                   });
                 }}
               >
-                Download again
+                Download
               </button>
               <button
                 type="button"

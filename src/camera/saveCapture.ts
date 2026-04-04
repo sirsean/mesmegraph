@@ -1,6 +1,6 @@
 /**
- * Still capture export (M6).
- * Prefer download + clipboard copy: Windows “Share” with files often fails to fill the clipboard for Discord.
+ * Still capture helpers (M6).
+ * Capture flow: gallery + clipboard; use {@link downloadBlob} from the gallery when the user wants a file.
  */
 
 export function downloadBlob(blob: Blob, filename: string): void {
@@ -67,44 +67,3 @@ export async function copyImageBlobToClipboard(blob: Blob): Promise<boolean> {
   return false;
 }
 
-export type CaptureSaveResult = {
-  /** Always true when this function returns (download was triggered). */
-  downloaded: true;
-  copiedClipboard: boolean;
-};
-
-/**
- * Saves the file to the user’s download folder and tries to put the same image on the clipboard.
- */
-export async function saveCaptureToDiskAndClipboard(
-  blob: Blob,
-  filename: string,
-): Promise<CaptureSaveResult> {
-  downloadBlob(blob, filename);
-  const copiedClipboard = await copyImageBlobToClipboard(blob);
-  return { downloaded: true, copiedClipboard };
-}
-
-/**
- * Optional: OS share sheet (mobile-friendly). Call only when the user explicitly chooses “Share”.
- */
-export async function shareCaptureFile(
-  blob: Blob,
-  filename: string,
-  share: { title: string },
-): Promise<boolean> {
-  const file = new File([blob], filename, { type: blob.type });
-  if (typeof navigator === "undefined" || !navigator.share) {
-    return false;
-  }
-  if (!navigator.canShare?.({ files: [file] })) {
-    return false;
-  }
-  try {
-    await navigator.share({ files: [file], title: share.title });
-    return true;
-  } catch (e) {
-    if (e instanceof Error && e.name === "AbortError") return true;
-    return false;
-  }
-}

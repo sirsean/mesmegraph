@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import { saveCaptureToDiskAndClipboard, shareCaptureFile } from "../camera/saveCapture";
+import { copyImageBlobToClipboard } from "../camera/saveCapture";
 import { CameraPreview, type CameraPreviewHandle } from "../components/CameraPreview";
 import type { SpecDefinition } from "../data/specs";
 import { getSpecById } from "../data/specs";
@@ -43,14 +43,7 @@ function CameraPageLive({ spec }: { spec: SpecDefinition }) {
   const [lensRetry, setLensRetry] = useState(0);
   const [captureBusy, setCaptureBusy] = useState(false);
   const [captureNotice, setCaptureNotice] = useState<string | null>(null);
-  const [hasLastCapture, setHasLastCapture] = useState(false);
   const [wireframeStrength, setWireframeStrength] = useState(() => readEdgeTraceStrength());
-  const lastCaptureRef = useRef<{ blob: Blob; filename: string } | null>(null);
-
-  const showOsShare =
-    typeof navigator !== "undefined" &&
-    typeof navigator.share === "function" &&
-    !/Windows/i.test(navigator.userAgent);
 
   useEffect(() => {
     let cancelled = false;
@@ -96,27 +89,22 @@ function CameraPageLive({ spec }: { spec: SpecDefinition }) {
       const blob = await handle.captureStill({ mime: "image/png" });
       if (!blob) return;
       const filename = `mesmegraph-${id}-${Date.now()}.png`;
-      const { copiedClipboard } = await saveCaptureToDiskAndClipboard(blob, filename);
+      const copiedClipboard = await copyImageBlobToClipboard(blob);
       const galleryOk = (await addCaptureToGallery(blob, { specId: id, filename })) !== null;
-      lastCaptureRef.current = { blob, filename };
-      setHasLastCapture(true);
-      const g = galleryOk ? " Stored in Gallery." : "";
-      if (copiedClipboard) {
-        setCaptureNotice(`Saved. Copied to clipboard.${g}`);
+      if (galleryOk && copiedClipboard) {
+        setCaptureNotice("Saved to Gallery. Copied to clipboard.");
+      } else if (galleryOk) {
+        setCaptureNotice("Saved to Gallery. Clipboard unavailable — use Download in Gallery for a file.");
+      } else if (copiedClipboard) {
+        setCaptureNotice("Copied to clipboard, but Gallery storage failed.");
       } else {
-        setCaptureNotice(`Saved. Use the downloaded file.${g}`);
+        setCaptureNotice("Could not save to Gallery or clipboard.");
       }
     } finally {
       setCaptureBusy(false);
       void refreshGalleryFill();
     }
   }, [captureBusy, effect, id, refreshGalleryFill]);
-
-  const onShareLast = useCallback(async () => {
-    const x = lastCaptureRef.current;
-    if (!x) return;
-    await shareCaptureFile(x.blob, x.filename, { title: "Mesmegraph" });
-  }, []);
 
   return (
     <div className="camera">
@@ -237,16 +225,6 @@ function CameraPageLive({ spec }: { spec: SpecDefinition }) {
         >
           {captureBusy ? "Saving…" : "Capture"}
         </button>
-        {showOsShare ? (
-          <button
-            type="button"
-            className="ghost-btn camera__share"
-            disabled={!hasLastCapture || captureBusy}
-            onClick={() => void onShareLast()}
-          >
-            Share…
-          </button>
-        ) : null}
       </div>
 
       {captureNotice ? (
