@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
+import {
+  loadReplacementGalleryBlob,
+  shouldUseReplacementInGallery,
+} from "../camera/galleryReplacement";
 import { copyImageBlobToClipboard } from "../camera/saveCapture";
 import { CameraPreview, type CameraPreviewHandle } from "../components/CameraPreview";
 import type { SpecDefinition } from "../data/specs";
@@ -90,7 +94,12 @@ function CameraPageLive({ spec }: { spec: SpecDefinition }) {
       if (!blob) return;
       const filename = `mesmegraph-${id}-${Date.now()}.png`;
       const copiedClipboard = await copyImageBlobToClipboard(blob);
-      const galleryOk = (await addCaptureToGallery(blob, { specId: id, filename })) !== null;
+      let galleryBlob = blob;
+      if (shouldUseReplacementInGallery(fillRatio)) {
+        const replacement = await loadReplacementGalleryBlob();
+        if (replacement) galleryBlob = replacement;
+      }
+      const galleryOk = (await addCaptureToGallery(galleryBlob, { specId: id, filename })) !== null;
       if (galleryOk && copiedClipboard) {
         setCaptureNotice("Saved to Gallery. Copied to clipboard.");
       } else if (galleryOk) {
@@ -104,7 +113,7 @@ function CameraPageLive({ spec }: { spec: SpecDefinition }) {
       setCaptureBusy(false);
       void refreshGalleryFill();
     }
-  }, [captureBusy, effect, id, refreshGalleryFill]);
+  }, [captureBusy, effect, fillRatio, id, refreshGalleryFill]);
 
   return (
     <div className="camera">
