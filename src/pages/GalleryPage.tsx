@@ -1,13 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { downloadBlob } from "../camera/saveCapture";
+import { GalleryDevelopOverlay } from "../components/GalleryDevelopOverlay";
 import { useGalleryFill } from "../context/GalleryFillContext";
 import {
   deleteGalleryCapture,
   getGalleryBlob,
+  isGalleryCaptureDeveloped,
   listGalleryMeta,
+  markGalleryCaptureDeveloped,
   type GalleryCaptureMeta,
 } from "../storage/captureGallery";
+import { galleryDevelopSeedFromId } from "../storage/galleryDevelopSeed";
 
 function formatWhen(ts: number): string {
   try {
@@ -27,7 +31,27 @@ function GalleryThumb({
   meta: GalleryCaptureMeta;
   onOpen: () => void;
 }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const ioStartedRef = useRef(false);
   const [url, setUrl] = useState<string | null>(null);
+  const [developed, setDeveloped] = useState<boolean | null>(null);
+  const [developOverlay, setDevelopOverlay] = useState(false);
+  /** True after develop canvas has painted once — veil drops so alpha curve reveals the photo. */
+  const [developLayerReady, setDevelopLayerReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void isGalleryCaptureDeveloped(meta.id).then((v) => {
+      if (!cancelled) setDeveloped(v);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [meta.id]);
+
+  useEffect(() => {
+    ioStartedRef.current = false;
+  }, [meta.id]);
 
   useEffect(() => {
     let revoked = false;
@@ -43,14 +67,74 @@ function GalleryThumb({
     };
   }, [meta.id]);
 
+  useEffect(() => {
+    if (developed !== false || !url) return;
+    const el = wrapRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const e = entries[0];
+        if (e?.isIntersecting && !ioStartedRef.current) {
+          ioStartedRef.current = true;
+          io.disconnect();
+          setDevelopLayerReady(false);
+          setDevelopOverlay(true);
+        }
+      },
+      { threshold: 0.1, rootMargin: "0px 0px 24px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [developed, url, meta.id]);
+
+  const onDevelopComplete = useCallback(() => {
+    void (async () => {
+      await markGalleryCaptureDeveloped(meta.id);
+      setDeveloped(true);
+      setDevelopOverlay(false);
+      setDevelopLayerReady(false);
+    })();
+  }, [meta.id]);
+
+  const allowOpen = developed === true;
+  /** Hide the bitmap until the develop layer has painted (avoids flash); removed once overlay draws so alpha can reveal the photo. */
+  const predevelopVeil =
+    Boolean(url) && developed !== true && (!developOverlay || !developLayerReady);
+
   return (
-    <button type="button" className="gallery__card" onClick={onOpen}>
-      <div className="gallery__thumb-wrap">
+    <button
+      type="button"
+      className={`gallery__card${!allowOpen ? " gallery__card--developing" : ""}`}
+      onClick={() => {
+        if (allowOpen) onOpen();
+      }}
+      disabled={!allowOpen}
+      aria-busy={!allowOpen}
+      aria-label={
+        allowOpen
+          ? `Open capture ${meta.filename}`
+          : "Capture is still developing in the tray"
+      }
+    >
+      <div ref={wrapRef} className="gallery__thumb-wrap">
         {url ? (
-          <img src={url} alt="" className="gallery__thumb" loading="lazy" />
+          <>
+            <img src={url} alt="" className="gallery__thumb" loading="lazy" />
+            {predevelopVeil ? (
+              <div className="gallery__predevelop-veil" aria-hidden />
+            ) : null}
+          </>
         ) : (
           <div className="gallery__thumb-placeholder" aria-hidden />
         )}
+        {developOverlay ? (
+          <GalleryDevelopOverlay
+            containerRef={wrapRef}
+            seed={galleryDevelopSeedFromId(meta.id)}
+            onFirstFrame={() => setDevelopLayerReady(true)}
+            onComplete={onDevelopComplete}
+          />
+        ) : null}
       </div>
       <p className="gallery__card-meta">
         <span className="gallery__card-spec">{meta.specId}</span>

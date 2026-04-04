@@ -7,9 +7,11 @@
 export const MAX_GALLERY_CAPTURES = 12;
 
 const DB_NAME = "mesmegraph-gallery";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const META_STORE = "gallery-meta";
 const BLOB_STORE = "gallery-blobs";
+/** First-time grid “develop” completed — key matches capture id */
+const VIEWED_STORE = "gallery-viewed";
 
 export type GalleryCaptureMeta = {
   id: string;
@@ -20,6 +22,7 @@ export type GalleryCaptureMeta = {
 
 type MetaRow = GalleryCaptureMeta;
 type BlobRow = { id: string; blob: Blob };
+type ViewedRow = { id: string };
 
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -33,6 +36,9 @@ function openDb(): Promise<IDBDatabase> {
       }
       if (!db.objectStoreNames.contains(BLOB_STORE)) {
         db.createObjectStore(BLOB_STORE, { keyPath: "id" });
+      }
+      if (!db.objectStoreNames.contains(VIEWED_STORE)) {
+        db.createObjectStore(VIEWED_STORE, { keyPath: "id" });
       }
     };
   });
@@ -77,14 +83,16 @@ export async function addCaptureToGallery(
       nDrop > 0 ? existing.slice(-nDrop).map((m) => m.id) : [];
 
     await new Promise<void>((resolve, reject) => {
-      const tx = database.transaction([META_STORE, BLOB_STORE], "readwrite");
+      const tx = database.transaction([META_STORE, BLOB_STORE, VIEWED_STORE], "readwrite");
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error ?? new Error("gallery write failed"));
       const metaStore = tx.objectStore(META_STORE);
       const blobStore = tx.objectStore(BLOB_STORE);
+      const viewedStore = tx.objectStore(VIEWED_STORE);
       for (const dropId of idsToDrop) {
         metaStore.delete(dropId);
         blobStore.delete(dropId);
+        viewedStore.delete(dropId);
       }
       metaStore.put(row);
       blobStore.put({ id, blob } satisfies BlobRow);
@@ -119,6 +127,35 @@ export async function getGalleryFillRatio(): Promise<number> {
   return Math.min(1, list.length / MAX_GALLERY_CAPTURES);
 }
 
+/** Whether this capture has finished the first-time grid “develop” reveal (persisted). */
+export async function isGalleryCaptureDeveloped(id: string): Promise<boolean> {
+  try {
+    const database = await db();
+    return await new Promise((resolve, reject) => {
+      const tx = database.transaction(VIEWED_STORE, "readonly");
+      const req = tx.objectStore(VIEWED_STORE).get(id);
+      req.onsuccess = () => resolve(req.result !== undefined);
+      req.onerror = () => reject(req.error ?? new Error("gallery viewed get failed"));
+    });
+  } catch {
+    return true;
+  }
+}
+
+export async function markGalleryCaptureDeveloped(id: string): Promise<void> {
+  try {
+    const database = await db();
+    await new Promise<void>((resolve, reject) => {
+      const tx = database.transaction(VIEWED_STORE, "readwrite");
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error ?? new Error("gallery viewed put failed"));
+      tx.objectStore(VIEWED_STORE).put({ id } satisfies ViewedRow);
+    });
+  } catch {
+    /* ignore */
+  }
+}
+
 export async function getGalleryBlob(id: string): Promise<Blob | null> {
   try {
     const database = await db();
@@ -140,11 +177,12 @@ export async function deleteGalleryCapture(id: string): Promise<boolean> {
   try {
     const database = await db();
     await new Promise<void>((resolve, reject) => {
-      const tx = database.transaction([META_STORE, BLOB_STORE], "readwrite");
+      const tx = database.transaction([META_STORE, BLOB_STORE, VIEWED_STORE], "readwrite");
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error ?? new Error("gallery delete failed"));
       tx.objectStore(META_STORE).delete(id);
       tx.objectStore(BLOB_STORE).delete(id);
+      tx.objectStore(VIEWED_STORE).delete(id);
     });
     return true;
   } catch {

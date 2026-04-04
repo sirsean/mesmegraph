@@ -713,10 +713,49 @@ a.ghost-btn {
 }
 
 .gallery__thumb-wrap {
+  position: relative;
   aspect-ratio: 3 / 4;
   width: 100%;
   overflow: hidden;
   background: #000;
+}
+
+/* Matches develop t=0 until WebGL/2D paints; sits under .gallery__develop-canvas (z-index 1). */
+.gallery__predevelop-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 88% 92% at 48% 50%,
+    rgb(22, 16, 11) 0%,
+    rgb(14, 10, 7) 52%,
+    rgb(6, 4, 3) 100%
+  );
+}
+
+.gallery__develop-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gallery__card--developing {
+  cursor: wait;
+}
+
+.gallery__card:disabled {
+  cursor: wait;
+  opacity: 0.92;
+}
+
+.gallery__card:disabled:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-card);
 }
 
 .gallery__thumb {
