@@ -5,6 +5,7 @@ import {
   shouldUseReplacementInGallery,
 } from "../camera/galleryReplacement";
 import { copyImageBlobToClipboard } from "../camera/saveCapture";
+import { stampDateOnImageBlob } from "../camera/stampCaptureDate";
 import { CameraPreview, type CameraPreviewHandle } from "../components/CameraPreview";
 import type { SpecDefinition } from "../data/specs";
 import { getSpecById } from "../data/specs";
@@ -92,12 +93,14 @@ function CameraPageLive({ spec }: { spec: SpecDefinition }) {
     try {
       const blob = await handle.captureStill({ mime: "image/png" });
       if (!blob) return;
-      const filename = `mesmegraph-${id}-${Date.now()}.png`;
-      const copiedClipboard = await copyImageBlobToClipboard(blob);
-      let galleryBlob = blob;
+      const shotAt = new Date();
+      const filename = `mesmegraph-${id}-${shotAt.getTime()}.png`;
+      const stampedLive = await stampDateOnImageBlob(blob, shotAt);
+      const copiedClipboard = await copyImageBlobToClipboard(stampedLive);
+      let galleryBlob = stampedLive;
       if (shouldUseReplacementInGallery(fillRatio)) {
         const replacement = await loadReplacementGalleryBlob();
-        if (replacement) galleryBlob = replacement;
+        if (replacement) galleryBlob = await stampDateOnImageBlob(replacement, shotAt, { glitchLabel: true });
       }
       const galleryOk = (await addCaptureToGallery(galleryBlob, { specId: id, filename })) !== null;
       if (galleryOk && copiedClipboard) {
