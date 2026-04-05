@@ -27,7 +27,7 @@ export function AppShell() {
       style={{ "--gallery-degrade": String(fillRatio) } as CSSProperties}
     >
       <div className="top-bar">
-        <div className="top-bar__left">
+        <div className="top-bar__nav">
           {pathname !== "/" && (
             <Link to="/" className="nav-pill">
               ← Deck
@@ -36,10 +36,10 @@ export function AppShell() {
           <Link to="/gallery" className="nav-pill">
             Gallery
           </Link>
-          <p className="machine-readout" aria-hidden>
-            {routeReadout(pathname)}
-          </p>
         </div>
+        <p className="machine-readout" aria-hidden>
+          {routeReadout(pathname)}
+        </p>
         <ThemeToggle />
       </div>
 

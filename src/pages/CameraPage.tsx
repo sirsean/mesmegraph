@@ -121,70 +121,93 @@ function CameraPageLive({ spec }: { spec: SpecDefinition }) {
   return (
     <div className="camera">
       <header className="camera__header">
-        <p className="eyebrow">Lens stack</p>
-        <h1 className="camera__title">{title}</h1>
-        <p className="camera__meta">
-          <span className="camera__code">SPEC · {code}</span>
-          <span className="camera__id" aria-label="Effect identifier">
-            · {id}
+        <h1 className="camera__rack">
+          <span className="camera__rack-bit camera__rack-bit--muted">Lens stack</span>
+          <span className="camera__rack-sep" aria-hidden="true">
+            /
           </span>
-        </p>
+          <span className="camera__rack-bit camera__rack-bit--title">{title}</span>
+          <span className="camera__rack-sep" aria-hidden="true">
+            /
+          </span>
+          <span className="camera__rack-bit camera__rack-bit--mono">
+            <span className="camera__code">SPEC · {code}</span>
+            <span className="camera__id" aria-label="Effect identifier">
+              {" "}
+              · {id}
+            </span>
+          </span>
+        </h1>
       </header>
 
-      <div
-        className={`camera__viewport${status === "live" ? " camera__viewport--live" : ""}`}
-        style={status !== "live" ? { background: preview } : undefined}
-      >
-        <video
-          ref={videoRef}
-          className="camera-feed-hidden"
-          playsInline
-          muted
-          autoPlay
-        />
-        {status === "live" && effect && !lensError ? (
-          <CameraPreview
-            ref={previewRef}
-            videoRef={videoRef}
-            effect={effect}
-            wireframeStrength={wireframeStrength}
-            galleryFillRatio={fillRatio}
+      <div className="camera__viewport-shell camera__viewport-shell--dock">
+        <div
+          className={`camera__viewport${status === "live" ? " camera__viewport--live" : ""}`}
+          style={status !== "live" ? { background: preview } : undefined}
+        >
+          <video
+            ref={videoRef}
+            className="camera-feed-hidden"
+            playsInline
+            muted
+            autoPlay
           />
-        ) : null}
+          {status === "live" && effect && !lensError ? (
+            <CameraPreview
+              ref={previewRef}
+              videoRef={videoRef}
+              effect={effect}
+              wireframeStrength={wireframeStrength}
+              galleryFillRatio={fillRatio}
+            />
+          ) : null}
 
-        {lensLoading ? (
-          <div className="camera__viewport-overlay camera__viewport-overlay--status">
-            <p className="camera__viewport-label">Loading lens</p>
-            <p className="camera__viewport-sub">Preparing effect pipeline</p>
-          </div>
-        ) : null}
+          {lensLoading ? (
+            <div className="camera__viewport-overlay camera__viewport-overlay--status">
+              <p className="camera__viewport-label">Loading lens</p>
+              <p className="camera__viewport-sub">Preparing effect pipeline</p>
+            </div>
+          ) : null}
 
-        {lensError ? (
-          <div className="camera__viewport-overlay camera__viewport-overlay--status">
-            <p className="camera__viewport-label">Lens unavailable</p>
-            <p className="camera__viewport-error">{lensError}</p>
-            <button type="button" className="ghost-btn camera__retry" onClick={() => setLensRetry((n) => n + 1)}>
-              Try again
-            </button>
-          </div>
-        ) : null}
+          {lensError ? (
+            <div className="camera__viewport-overlay camera__viewport-overlay--status">
+              <p className="camera__viewport-label">Lens unavailable</p>
+              <p className="camera__viewport-error">{lensError}</p>
+              <button type="button" className="ghost-btn camera__retry" onClick={() => setLensRetry((n) => n + 1)}>
+                Try again
+              </button>
+            </div>
+          ) : null}
 
-        {status === "pending" ? (
-          <div className="camera__viewport-overlay camera__viewport-overlay--status">
-            <p className="camera__viewport-label">Opening aperture</p>
-            <p className="camera__viewport-sub">Requesting camera access</p>
-          </div>
-        ) : null}
+          {status === "pending" ? (
+            <div className="camera__viewport-overlay camera__viewport-overlay--status">
+              <p className="camera__viewport-label">Opening aperture</p>
+              <p className="camera__viewport-sub">Requesting camera access</p>
+            </div>
+          ) : null}
 
-        {status === "error" && errorMessage ? (
-          <div className="camera__viewport-overlay camera__viewport-overlay--status">
-            <p className="camera__viewport-label">No signal</p>
-            <p className="camera__viewport-error">{errorMessage}</p>
-            <button type="button" className="ghost-btn camera__retry" onClick={retry}>
-              Try again
-            </button>
-          </div>
-        ) : null}
+          {status === "error" && errorMessage ? (
+            <div className="camera__viewport-overlay camera__viewport-overlay--status">
+              <p className="camera__viewport-label">No signal</p>
+              <p className="camera__viewport-error">{errorMessage}</p>
+              <button type="button" className="ghost-btn camera__retry" onClick={retry}>
+                Try again
+              </button>
+            </div>
+          ) : null}
+        </div>
+
+        <div className="camera__capture camera__capture--dock" aria-label="Still capture">
+          <button
+            type="button"
+            className="ghost-btn camera__shutter"
+            disabled={status !== "live" || !effect || lensError !== null || captureBusy}
+            aria-busy={captureBusy}
+            onClick={() => void onCapture()}
+          >
+            {captureBusy ? "Saving…" : "Capture"}
+          </button>
+        </div>
       </div>
 
       {status === "live" && effect && !lensError ? (
@@ -226,18 +249,6 @@ function CameraPageLive({ spec }: { spec: SpecDefinition }) {
           </div>
         </div>
       ) : null}
-
-      <div className="camera__capture" aria-label="Still capture">
-        <button
-          type="button"
-          className="ghost-btn camera__shutter"
-          disabled={status !== "live" || !effect || lensError !== null || captureBusy}
-          aria-busy={captureBusy}
-          onClick={() => void onCapture()}
-        >
-          {captureBusy ? "Saving…" : "Capture"}
-        </button>
-      </div>
 
       {captureNotice ? (
         <p className="camera__capture-notice" role="status" aria-live="polite">

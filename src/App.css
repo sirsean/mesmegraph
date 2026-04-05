@@ -12,15 +12,29 @@
 }
 
 .top-bar {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "nav theme"
+    "readout readout";
+  column-gap: 0.65rem;
+  row-gap: 0.35rem;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.85rem;
+  margin-bottom: 1.1rem;
+  padding-bottom: 0.65rem;
   border-bottom: 1px solid var(--color-border);
   position: relative;
+}
+
+@media (min-width: 720px) {
+  .top-bar {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "nav readout theme";
+    column-gap: 1rem;
+    row-gap: 0;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.85rem;
+  }
 }
 
 /* Deck “signal stripe” — uses mineral teal + signal pink + brass accent */
@@ -41,12 +55,33 @@
   pointer-events: none;
 }
 
-.top-bar__left {
+.top-bar__nav {
+  grid-area: nav;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 0.55rem 1rem;
+  gap: 0.45rem 0.65rem;
   min-width: 0;
+}
+
+.top-bar > .machine-readout {
+  grid-area: readout;
+  min-width: 0;
+}
+
+.top-bar > .theme-toggle {
+  grid-area: theme;
+  justify-self: end;
+}
+
+@media (min-width: 720px) {
+  .top-bar__nav {
+    gap: 0.55rem 1rem;
+  }
+
+  .top-bar > .machine-readout {
+    justify-self: start;
+  }
 }
 
 .nav-pill {
@@ -81,6 +116,10 @@
   letter-spacing: var(--track-wide);
   text-transform: uppercase;
   color: var(--color-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .hero {
@@ -259,7 +298,63 @@ a.ghost-btn {
 }
 
 .camera__header {
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.55rem;
+}
+
+/* Single-line lens / title / spec strip above the viewport */
+.camera__rack {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: nowrap;
+  gap: 0.3rem;
+  margin: 0;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: clamp(0.68rem, 2.8vw, 0.78rem);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.25;
+  color: var(--color-cream);
+}
+
+.camera__rack-sep {
+  flex-shrink: 0;
+  color: var(--color-border-strong);
+  font-weight: 300;
+  opacity: 0.85;
+}
+
+.camera__rack-bit {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.camera__rack-bit--muted {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  letter-spacing: var(--track-wide);
+  color: var(--color-dim);
+}
+
+.camera__rack-bit--title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-cream);
+}
+
+.camera__rack-bit--mono {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--color-muted);
 }
 
 .camera__title {
@@ -289,12 +384,22 @@ a.ghost-btn {
   color: var(--color-accent-dim);
 }
 
+.camera__viewport-shell {
+  position: relative;
+  width: 100%;
+  margin: 0 auto 1.25rem;
+}
+
+.camera__viewport-shell--dock {
+  margin-bottom: 2.45rem;
+}
+
 .camera__viewport {
   position: relative;
   width: 100%;
   aspect-ratio: 3 / 4;
   max-height: min(70dvh, 520px);
-  margin: 0 auto 1.25rem;
+  margin: 0;
   border: 1px solid color-mix(in srgb, var(--color-mineral-teal) 35%, var(--color-border-strong));
   border-radius: 2px;
   box-shadow:
@@ -303,6 +408,25 @@ a.ghost-btn {
     inset 0 0 32px color-mix(in srgb, var(--color-mineral-teal) 6%, transparent);
   overflow: hidden;
   background-color: var(--color-void-elevated);
+}
+
+@media (max-width: 47.99rem) {
+  .camera__viewport-shell {
+    width: 100vw;
+    max-width: none;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+  }
+
+  .camera__viewport-shell--dock {
+    margin-bottom: 2.6rem;
+  }
+
+  .camera__viewport {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
 }
 
 .camera__viewport--live {
@@ -611,6 +735,37 @@ a.ghost-btn {
   align-items: center;
   gap: 0.75rem 1rem;
   margin-bottom: 1.25rem;
+}
+
+.camera__capture--dock {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 50%);
+  z-index: 5;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.camera__capture--dock .camera__shutter {
+  pointer-events: auto;
+  min-height: 3rem;
+  min-width: min(11.5rem, calc(100vw - 2.25rem));
+  padding: 0.55rem 1.6rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--color-void-elevated) 88%, var(--color-cream)) 0%,
+    var(--color-void) 55%,
+    color-mix(in srgb, var(--color-void) 94%, #000) 100%
+  );
+  border-color: color-mix(in srgb, var(--color-border-strong) 55%, var(--color-mineral-teal));
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.58),
+    0 0 0 1px color-mix(in srgb, var(--color-signal-pink) 22%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--color-cream) 10%, transparent);
 }
 
 .camera__shutter {
@@ -928,6 +1083,8 @@ a.ghost-btn {
 /* Display titles — stronger channel split */
 .shell--storage-tension .hero h1,
 .shell--storage-tension .camera__title,
+.shell--storage-tension .camera__rack,
+.shell--storage-tension .camera__rack-bit--title,
 .shell--storage-tension .gallery__title,
 .shell--storage-tension .deck__heading,
 .shell--storage-tension .spec-card__title,
@@ -941,6 +1098,8 @@ a.ghost-btn {
 
 /* Section labels & mono readouts */
 .shell--storage-tension .eyebrow,
+.shell--storage-tension .camera__rack-bit--muted,
+.shell--storage-tension .camera__rack-bit--mono,
 .shell--storage-tension .camera__code,
 .shell--storage-tension .camera__id,
 .shell--storage-tension .camera__viewport-sub,
@@ -1164,11 +1323,15 @@ a.ghost-btn {
   .shell--storage-tension .machine-readout,
   .shell--storage-tension .hero h1,
   .shell--storage-tension .camera__title,
+  .shell--storage-tension .camera__rack,
+  .shell--storage-tension .camera__rack-bit--title,
   .shell--storage-tension .gallery__title,
   .shell--storage-tension .deck__heading,
   .shell--storage-tension .spec-card__title,
   .shell--storage-tension .camera__viewport-label,
   .shell--storage-tension .eyebrow,
+  .shell--storage-tension .camera__rack-bit--muted,
+  .shell--storage-tension .camera__rack-bit--mono,
   .shell--storage-tension .camera__code,
   .shell--storage-tension .camera__id,
   .shell--storage-tension .camera__viewport-sub,
@@ -1190,11 +1353,15 @@ a.ghost-btn {
   .shell--storage-tension .machine-readout,
   .shell--storage-tension .hero h1,
   .shell--storage-tension .camera__title,
+  .shell--storage-tension .camera__rack,
+  .shell--storage-tension .camera__rack-bit--title,
   .shell--storage-tension .gallery__title,
   .shell--storage-tension .deck__heading,
   .shell--storage-tension .spec-card__title,
   .shell--storage-tension .camera__viewport-label,
   .shell--storage-tension .eyebrow,
+  .shell--storage-tension .camera__rack-bit--muted,
+  .shell--storage-tension .camera__rack-bit--mono,
   .shell--storage-tension .camera__code,
   .shell--storage-tension .camera__id,
   .shell--storage-tension .camera__viewport-sub,
