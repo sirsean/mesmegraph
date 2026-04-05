@@ -802,6 +802,7 @@ a.ghost-btn {
   padding-bottom: 1rem;
 }
 
+/* Portaled to document.body so position:fixed is viewport-relative (.shell uses filter, which traps fixed). */
 .gallery__modal-backdrop {
   position: fixed;
   inset: 0;

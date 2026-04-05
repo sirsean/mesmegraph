@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { downloadBlob } from "../camera/saveCapture";
 import { GalleryDevelopOverlay } from "../components/GalleryDevelopOverlay";
@@ -230,42 +231,45 @@ export function GalleryPage() {
         </Link>
       </div>
 
-      {lightbox ? (
-        <div
-          className="gallery__modal-backdrop"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Capture preview"
-          onClick={closeLightbox}
-        >
-          <div className="gallery__modal" onClick={(e) => e.stopPropagation()}>
-            <img src={lightbox.url} alt={lightbox.meta.filename} className="gallery__modal-img" />
-            <div className="gallery__modal-actions">
-              <button
-                type="button"
-                className="ghost-btn"
-                onClick={() => {
-                  void getGalleryBlob(lightbox.meta.id).then((b) => {
-                    if (b) downloadBlob(b, lightbox.meta.filename);
-                  });
-                }}
-              >
-                Download
-              </button>
-              <button
-                type="button"
-                className="ghost-btn gallery__modal-delete"
-                onClick={() => void onDelete(lightbox.meta.id)}
-              >
-                Delete
-              </button>
-              <button type="button" className="ghost-btn" onClick={closeLightbox}>
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {lightbox && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              className="gallery__modal-backdrop"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Capture preview"
+              onClick={closeLightbox}
+            >
+              <div className="gallery__modal" onClick={(e) => e.stopPropagation()}>
+                <img src={lightbox.url} alt={lightbox.meta.filename} className="gallery__modal-img" />
+                <div className="gallery__modal-actions">
+                  <button
+                    type="button"
+                    className="ghost-btn"
+                    onClick={() => {
+                      void getGalleryBlob(lightbox.meta.id).then((b) => {
+                        if (b) downloadBlob(b, lightbox.meta.filename);
+                      });
+                    }}
+                  >
+                    Download
+                  </button>
+                  <button
+                    type="button"
+                    className="ghost-btn gallery__modal-delete"
+                    onClick={() => void onDelete(lightbox.meta.id)}
+                  >
+                    Delete
+                  </button>
+                  <button type="button" className="ghost-btn" onClick={closeLightbox}>
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }
