@@ -75,17 +75,19 @@ export function SpecCard({
       </header>
       <div className="spec-card__body">
         <div
-          className="spec-card__viewport"
-          style={
-            deckCardImage
-              ? {
-                  backgroundImage: `url(${deckCardImage})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }
-              : { background: preview }
-          }
-        />
+          className={`spec-card__viewport${deckCardImage ? " spec-card__viewport--deck" : ""}`}
+          style={deckCardImage ? undefined : { background: preview }}
+        >
+          {deckCardImage ? (
+            <img
+              src={deckCardImage}
+              alt=""
+              className="spec-card__viewport-img"
+              decoding="async"
+              loading="lazy"
+            />
+          ) : null}
+        </div>
       </div>
       <Link
         to={cameraTo}
