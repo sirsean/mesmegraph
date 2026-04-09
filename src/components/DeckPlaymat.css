@@ -1,0 +1,329 @@
+.deck-playmat {
+  margin-bottom: 1.5rem;
+  overscroll-behavior-y: contain;
+}
+
+.deck-playmat__layout {
+  display: block;
+}
+
+.deck-playmat__reader-col,
+.deck-playmat__hand-col {
+  min-width: 0;
+}
+
+.deck-playmat__reader {
+  max-width: 22rem;
+  margin: 0 auto 1.5rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  align-items: stretch;
+}
+
+.deck-playmat__reader--drop-hover .deck-playmat__reader-frame {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border-strong));
+  box-shadow:
+    var(--shadow-card),
+    0 0 0 1px color-mix(in srgb, var(--color-signal-pink) 35%, transparent),
+    inset 0 0 24px color-mix(in srgb, var(--color-mineral-teal) 12%, transparent);
+}
+
+.deck-playmat__reader-frame {
+  position: relative;
+  background: var(--color-void-elevated);
+  border: 1px solid color-mix(in srgb, var(--color-mineral-teal) 35%, var(--color-border-strong));
+  border-radius: 2px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  min-height: 12rem;
+}
+
+.deck-playmat__reader-frame::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px dashed var(--color-border);
+  border-radius: 1px;
+  pointer-events: none;
+  opacity: 0.52;
+  z-index: 1;
+}
+
+.deck-playmat__reader-rail {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem 0.65rem;
+  padding: 0.55rem clamp(0.65rem, 2.5vw, 0.85rem) 0.45rem;
+  border-bottom: 1px solid var(--color-border);
+  margin: 0 clamp(0.65rem, 2.5vw, 0.85rem);
+}
+
+.deck-playmat__reader-code {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: var(--track-wide);
+  color: var(--color-mineral-teal);
+}
+
+.deck-playmat__reader-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 3.2vw, 1.2rem);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  color: var(--color-cream);
+}
+
+.deck-playmat__reader-viewport {
+  position: relative;
+  z-index: 2;
+  padding: 0.5rem clamp(0.65rem, 2.5vw, 0.85rem) 0.65rem;
+}
+
+.deck-playmat img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.deck-playmat__thumb-img,
+.deck-playmat__slot-img {
+  pointer-events: none;
+}
+
+.deck-playmat__slot-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 1px;
+  border: 1px solid var(--color-border-strong);
+}
+
+.deck-playmat__slot-gradient {
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  max-height: min(52dvh, 420px);
+  margin: 0 auto;
+  border-radius: 1px;
+  border: 1px solid var(--color-border-strong);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.deck-playmat__reader-empty {
+  position: relative;
+  z-index: 2;
+  min-height: 11rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 1.25rem 1rem;
+  text-align: center;
+}
+
+.deck-playmat__reader-empty-label {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-cream);
+  opacity: 0.85;
+}
+
+.deck-playmat__reader-empty-sub {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--color-dim);
+  max-width: 16rem;
+  line-height: 1.35;
+}
+
+.deck-playmat__open {
+  width: 100%;
+  max-width: 22rem;
+  margin: 0 auto;
+  align-self: center;
+}
+
+.deck-playmat__open:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  filter: grayscale(0.25);
+  box-shadow: none;
+}
+
+.deck-playmat__open:disabled:hover {
+  filter: grayscale(0.25);
+}
+
+.deck-playmat__hand-label {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--color-dim);
+}
+
+.deck-playmat__hand {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 0.85rem;
+  justify-content: center;
+}
+
+@media (min-width: 900px) {
+  .deck-playmat__layout {
+    display: grid;
+    grid-template-columns: minmax(16.5rem, 22rem) minmax(0, 1fr);
+    gap: clamp(1.25rem, 2.8vw, 2.25rem);
+    align-items: start;
+  }
+
+  .deck-playmat__reader {
+    margin: 0;
+    max-width: none;
+    width: 100%;
+  }
+
+  .deck-playmat__hand-label {
+    margin-bottom: 0.65rem;
+  }
+
+  .deck-playmat__hand {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(6.75rem, 7.25rem));
+    justify-content: start;
+    gap: 0.85rem 1rem;
+  }
+}
+
+.deck-playmat__hand-cell {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.deck-playmat__card {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  width: 6.75rem;
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-void-elevated);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 2px;
+  box-shadow: var(--shadow-card);
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  position: relative;
+}
+
+.deck-playmat__card:active {
+  cursor: grabbing;
+}
+
+.deck-playmat__card:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.deck-playmat__card--in-reader {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border-strong));
+  box-shadow:
+    var(--shadow-card),
+    0 0 0 1px color-mix(in srgb, var(--color-mineral-teal) 40%, transparent);
+}
+
+/* Source card while its clone is following the pointer */
+.deck-playmat__card--dragging {
+  opacity: 0.22;
+  transition: opacity 0.08s ease;
+}
+
+.deck-playmat__thumb {
+  width: 100%;
+  overflow: hidden;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-void);
+}
+
+.deck-playmat__thumb--gradient {
+  aspect-ratio: 5 / 7;
+}
+
+.deck-playmat__thumb-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: top;
+}
+
+.deck-playmat__card-meta {
+  padding: 0.4rem 0.45rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.deck-playmat__card-code {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: var(--track-wide);
+  color: var(--color-mineral-teal);
+}
+
+.deck-playmat__card-title {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: var(--color-cream);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Full lens card clone under cursor (not a bare image drag) */
+.deck-playmat__float {
+  position: fixed;
+  z-index: 2000;
+  pointer-events: none;
+  width: 6.75rem;
+  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.62));
+}
+
+.deck-playmat__card--float-clone {
+  cursor: grabbing;
+  opacity: 0.98;
+  transform: scale(1.02);
+  box-shadow:
+    var(--shadow-card),
+    0 0 0 1px color-mix(in srgb, var(--color-mineral-teal) 35%, transparent);
+}
+
+.shell--storage-tension .deck-playmat__open:disabled {
+  box-shadow: none;
+}

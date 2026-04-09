@@ -1087,7 +1087,9 @@ a.ghost-btn {
 .shell--storage-tension .camera__rack-bit--title,
 .shell--storage-tension .gallery__title,
 .shell--storage-tension .deck__heading,
-.shell--storage-tension .spec-card__title,
+.shell--storage-tension .deck-playmat__reader-title,
+.shell--storage-tension .deck-playmat__reader-empty-label,
+.shell--storage-tension .deck-playmat__card-title,
 .shell--storage-tension .camera__viewport-label {
   text-shadow:
     calc(var(--gd) * 2.5px) 0 color-mix(in srgb, var(--color-signal-pink) 68%, transparent),
@@ -1114,7 +1116,10 @@ a.ghost-btn {
 .shell--storage-tension .gallery__card-time,
 .shell--storage-tension .theme-toggle__label,
 .shell--storage-tension .theme-toggle__mono,
-.shell--storage-tension .spec-card__code {
+.shell--storage-tension .deck-playmat__reader-code,
+.shell--storage-tension .deck-playmat__card-code,
+.shell--storage-tension .deck-playmat__hand-label,
+.shell--storage-tension .deck-playmat__reader-empty-sub {
   text-shadow:
     calc(var(--gd) * 1.5px) 0 color-mix(in srgb, var(--color-signal-pink) 55%, transparent),
     calc(var(--gd) * -1.5px) 0 color-mix(in srgb, var(--color-mineral-teal) 50%, transparent);
@@ -1149,13 +1154,47 @@ a.ghost-btn {
     0 4px 20px var(--color-glow);
 }
 
-.shell--storage-tension .spec-card {
+/* Deck CTA: re-apply primary glitch with higher specificity (DeckPlaymat.css follows App.css in bundle) */
+.shell--storage-tension .primary-btn.deck-playmat__open:not(:disabled) {
+  box-shadow:
+    calc(var(--gd) * 4px) calc(var(--gd) * 2px) 0
+      color-mix(in srgb, var(--color-signal-pink) calc(20% + var(--gd) * 28%), transparent),
+    calc(var(--gd) * -3px) calc(var(--gd) * -1px) 0
+      color-mix(in srgb, var(--color-mineral-teal) calc(15% + var(--gd) * 25%), transparent),
+    0 4px 20px var(--color-glow);
+  border-radius: calc(1px + var(--gd) * 2px) calc(1px + var(--gd) * 1px) calc(1px + var(--gd) * 3px)
+    calc(1px + var(--gd) * 1px);
+}
+
+.shell--storage-tension .deck-playmat__reader-frame {
   transform: skewX(calc(var(--gd) * -0.35deg));
+  border-color: color-mix(
+    in srgb,
+    var(--color-mineral-teal) calc(35% + var(--gd) * 22%),
+    var(--color-border-strong)
+  );
   box-shadow:
     var(--shadow-card),
+    0 0 0 1px color-mix(in srgb, var(--color-signal-pink) calc(18% + var(--gd) * 28%), transparent),
+    inset 0 0 28px color-mix(in srgb, var(--color-mineral-teal) calc(6% + var(--gd) * 10%), transparent),
     calc(var(--gd) * 4px) calc(var(--gd) * 2px) 0
       color-mix(in srgb, var(--color-accent) calc(10% + var(--gd) * 18%), transparent);
   border-radius: calc(2px + var(--gd) * 2px) 1px 2px calc(1px + var(--gd) * 3px);
+}
+
+/* Drop-hover must keep storage-tension offsets (DeckPlaymat.css hover rule loads later and would strip --gd) */
+.shell--storage-tension .deck-playmat__reader--drop-hover .deck-playmat__reader-frame {
+  border-color: color-mix(
+    in srgb,
+    var(--color-accent) calc(52% + var(--gd) * 18%),
+    var(--color-border-strong)
+  );
+  box-shadow:
+    var(--shadow-card),
+    0 0 0 1px color-mix(in srgb, var(--color-signal-pink) calc(30% + var(--gd) * 30%), transparent),
+    inset 0 0 28px color-mix(in srgb, var(--color-mineral-teal) calc(14% + var(--gd) * 12%), transparent),
+    calc(var(--gd) * 5px) calc(var(--gd) * 3px) 0
+      color-mix(in srgb, var(--color-accent) calc(12% + var(--gd) * 22%), transparent);
 }
 
 /* Deck stack dashed inner frame: flicker, dropout, and “torn” segments */
@@ -1247,32 +1286,8 @@ a.ghost-btn {
   }
 }
 
-.shell--storage-tension .spec-card::before {
+.shell--storage-tension .deck-playmat__reader-frame::before {
   animation: degrade-spec-dash-frame calc(2.75s - var(--gd) * 1.2s) linear infinite;
-}
-
-.shell--storage-tension .deck__cell:nth-child(1) .spec-card::before {
-  animation-delay: 0s;
-}
-
-.shell--storage-tension .deck__cell:nth-child(2) .spec-card::before {
-  animation-delay: -0.42s;
-}
-
-.shell--storage-tension .deck__cell:nth-child(3) .spec-card::before {
-  animation-delay: -0.94s;
-}
-
-.shell--storage-tension .deck__cell:nth-child(4) .spec-card::before {
-  animation-delay: -1.38s;
-}
-
-.shell--storage-tension .deck__cell:nth-child(5) .spec-card::before {
-  animation-delay: -1.85s;
-}
-
-.shell--storage-tension .deck__cell:nth-child(6) .spec-card::before {
-  animation-delay: -2.3s;
 }
 
 .shell--storage-tension .gallery__card {
@@ -1281,6 +1296,15 @@ a.ghost-btn {
     calc(var(--gd) * 3px) calc(var(--gd) * 2px) 0
       color-mix(in srgb, var(--color-signal-pink) calc(12% + var(--gd) * 20%), transparent);
   border-radius: calc(2px + var(--gd) * 2px) calc(1px + var(--gd) * 3px) 2px 1px;
+}
+
+.shell--storage-tension .deck-playmat__card {
+  transform: skewX(calc(var(--gd) * -0.22deg));
+  box-shadow:
+    var(--shadow-card),
+    calc(var(--gd) * 3px) calc(var(--gd) * 2px) 0
+      color-mix(in srgb, var(--color-signal-pink) calc(12% + var(--gd) * 20%), transparent);
+  border-radius: calc(2px + var(--gd) * 1px) 1px 2px calc(1px + var(--gd) * 2px);
 }
 
 .shell--storage-tension .camera__viewport {
@@ -1327,7 +1351,9 @@ a.ghost-btn {
   .shell--storage-tension .camera__rack-bit--title,
   .shell--storage-tension .gallery__title,
   .shell--storage-tension .deck__heading,
-  .shell--storage-tension .spec-card__title,
+  .shell--storage-tension .deck-playmat__reader-title,
+  .shell--storage-tension .deck-playmat__reader-empty-label,
+  .shell--storage-tension .deck-playmat__card-title,
   .shell--storage-tension .camera__viewport-label,
   .shell--storage-tension .eyebrow,
   .shell--storage-tension .camera__rack-bit--muted,
@@ -1346,7 +1372,10 @@ a.ghost-btn {
   .shell--storage-tension .gallery__card-time,
   .shell--storage-tension .theme-toggle__label,
   .shell--storage-tension .theme-toggle__mono,
-  .shell--storage-tension .spec-card__code {
+  .shell--storage-tension .deck-playmat__reader-code,
+  .shell--storage-tension .deck-playmat__card-code,
+  .shell--storage-tension .deck-playmat__hand-label,
+  .shell--storage-tension .deck-playmat__reader-empty-sub {
     animation: none;
   }
 
@@ -1357,7 +1386,9 @@ a.ghost-btn {
   .shell--storage-tension .camera__rack-bit--title,
   .shell--storage-tension .gallery__title,
   .shell--storage-tension .deck__heading,
-  .shell--storage-tension .spec-card__title,
+  .shell--storage-tension .deck-playmat__reader-title,
+  .shell--storage-tension .deck-playmat__reader-empty-label,
+  .shell--storage-tension .deck-playmat__card-title,
   .shell--storage-tension .camera__viewport-label,
   .shell--storage-tension .eyebrow,
   .shell--storage-tension .camera__rack-bit--muted,
@@ -1376,16 +1407,20 @@ a.ghost-btn {
   .shell--storage-tension .gallery__card-time,
   .shell--storage-tension .theme-toggle__label,
   .shell--storage-tension .theme-toggle__mono,
-  .shell--storage-tension .spec-card__code {
+  .shell--storage-tension .deck-playmat__reader-code,
+  .shell--storage-tension .deck-playmat__card-code,
+  .shell--storage-tension .deck-playmat__hand-label,
+  .shell--storage-tension .deck-playmat__reader-empty-sub {
     opacity: 1;
   }
 
-  .shell--storage-tension .spec-card,
+  .shell--storage-tension .deck-playmat__reader-frame,
+  .shell--storage-tension .deck-playmat__card,
   .shell--storage-tension .camera__wireframe-panel {
     transform: none;
   }
 
-  .shell--storage-tension .spec-card::before {
+  .shell--storage-tension .deck-playmat__reader-frame::before {
     animation: none;
     clip-path: none;
     opacity: calc(0.45 + var(--gd) * 0.2);

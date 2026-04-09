@@ -5,7 +5,7 @@ This file guides automated and human contributors so changes stay aligned with `
 ## Project identity
 
 - **Name:** Mesmegraph.
-- **Product:** Mobile-first web camera: **deck** of four spec stacks (`DeckPage` + `SpecCard`), each opening **`/camera/:specId`**; **last-opened** spec id persists for bare **`/camera`**; live filters + **PNG** stills that match the preview canvas.
+- **Product:** Mobile-first web camera: **home deck** (`DeckPage` + `DeckPlaymat`) — draggable **lens cards** into a single **reader** slot, then **Open lens stack** → **`/camera/:specId`**; **last-opened** spec id persists for bare **`/camera`**; live filters + **PNG** stills that match the preview canvas.
 - **Stack:** **React** + **Vite** + **Cloudflare Workers** (static assets + optional Worker script). Prefer the [Cloudflare Vite plugin](https://developers.cloudflare.com/workers/vite-plugin/) workflow over legacy Pages-only assumptions.
 - **Tone:** **Hyperspec** + **Mesmegraph** in UI copy. Do **not** surface the word **Fringe** in the UI. Void/cream palette, monospace / instrument labels—see `PLAN.md` and `art/`.
 
@@ -16,8 +16,8 @@ This file guides automated and human contributors so changes stay aligned with `
 - `art/` — concept art and `hyperspec-badge-source.png` (logo derivation reference).
 - `public/` — static assets: **favicon** / **apple-touch-icon** (from `art/hyperspec-badge-source.png` via `npm run brand-assets`), **og-social-card.png** (link-preview image from `art/4994fb85-b9c6-4129-8d7f-6298f87932a6.png`). Regenerate icons after changing the badge source.
 - `src/` — React app (`react-router-dom`): **`/`** minimal hero + deck; **`/camera/:specId`** live preview + capture; **`/camera`** → last-opened or default spec.
-- `src/pages/DeckPage.tsx` — four spec cards; per-card **Open lens stack**; no global open CTA; no “selected” highlight (optional **dashed-frame flicker** on cards, off under `prefers-reduced-motion`).
-- `src/components/SpecCard.tsx` — deck card chrome: punch rows, **stack number + title** (no subtitle slugs), **inner dashed frame only** (no solid outer stroke), gradient viewport.
+- `src/pages/DeckPage.tsx` — deck heading + **`DeckPlaymat`** (reader + draggable hand of lens cards).
+- `src/components/DeckPlaymat.tsx` — single **reader** (dashed inner frame), **Open lens stack** enabled only after a card is **dropped** on the reader (pointer drag); navigates with **`writeSelectedSpecId`**.
 - `src/data/specs.ts` — **`SPEC_LIST`** (four specs: `hyp`, `inv`, `gl`, `heat`) and `effectId` keys.
 - `src/storage/selectedSpec.ts` — **`localStorage`** key `mesmegraph-selected-spec`: **last-opened** spec id when a stack is opened (for **`/camera`** redirect only).
 - `src/hooks/useCameraStream.ts` — `getUserMedia` lifecycle.

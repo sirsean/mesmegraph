@@ -46,7 +46,7 @@ Track progress by checking items when done. Phases build on each other.
 
 - [x] Typography: **Chakra Petch** (display / spec titles) + **IBM Plex Mono** (codes, rails, machine readout) — see `index.html` + `src/index.css`.
 - [x] Palette: **void** / **cream** poles, accent brass, elevated surfaces, borders — full token sets in `src/index.css` for dark + light.
-- [x] Card chrome: punch rows, **stack number + title** header (no subtitle slugs on deck cards), **inner dashed frame only** (no solid outer stroke on the card), preview viewport, per-card **Open lens stack** control — `src/components/SpecCard.tsx` + `DeckPage`. Decorative **dashed-frame flicker** (random 2.5–5.5s interval per card, disabled when `prefers-reduced-motion: reduce`).
+- [x] Deck **reader + hand**: draggable lens cards into one **reader** slot; single **Open lens stack** (armed after pointer drop) — `src/components/DeckPlaymat.tsx` + `DeckPage`. Storage-tension **dashed-frame** animation on the reader (`prefers-reduced-motion: reduce` disables motion).
 - [x] Dark-first UI with **light theme** toggle (`ThemeToggle` + `localStorage` via `src/theme/initTheme.ts`); film grain + light scanline atmosphere on `body`.
 
 ### M3 — Navigation & deck UX
